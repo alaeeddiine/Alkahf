@@ -1,0 +1,119 @@
+import React from 'react';
+import { FaBookOpen, FaHandHoldingHeart, FaMedal, FaGlobeAfrica } from 'react-icons/fa';
+import { GiBookshelf, GiScrollUnfurled } from 'react-icons/gi'; // Nouvelles icônes plus "bibliothèque"
+import banner from '../assets/banner.png'; // Assurez-vous que l'image est une belle photo de livres anciens
+
+const About = () => {
+  return (
+    <div className="library-theme-page">
+      {/* --- HERO SECTION: L'Entrée de la Bibliothèque --- */}
+      <section className="lib-hero">
+        <div className="lib-hero-overlay"></div>
+        <div className="lib-container hero-content-flex">
+          <div className="hero-text-block">
+            <span className="lib-overtitle font-cairo">مكتبة الكهف</span>
+            <h1 className="font-cairo">L'Héritage d'<span className="gold-highlight">Alkahf</span></h1>
+            <div className="lib-separator-ornament"><GiScrollUnfurled /></div>
+            <p className="font-amiri">
+              "Le livre est comme un jardin porté dans la poche." <br/>
+              Votre sanctuaire pour une littérature islamique authentique, curatée avec sagesse.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* --- MISSION SECTION: La Salle de Lecture --- */}
+      <section className="lib-section lib-mission">
+        <div className="lib-container lib-split-layout">
+          
+          <div className="lib-content-side">
+            <div className="lib-heading-group">
+              <span className="section-tag font-cairo">Notre Vocation</span>
+              <h2 className="font-cairo">Tisser le lien du <span className="text-gold">Savoir</span></h2>
+            </div>
+            
+            <div className="lib-text-body font-amiri">
+              <p className="drop-cap">
+                Chez Islamic Books, nous nous considérons comme les gardiens d'une bibliothèque vivante. Notre mission n'est pas seulement de vendre des livres, mais de rendre accessible un patrimoine.
+              </p>
+              <p>
+                Nous sélectionnons des ouvrages dont l'encre porte la lumière de l'authenticité. Provenant de savants reconnus, chaque livre est une pierre ajoutée à l'édifice de la connaissance, pour les musulmans et les chercheurs de vérité.
+              </p>
+            </div>
+            <div className="lib-signature font-amiri">— Les Bibliothécaires d'Alkahf</div>
+          </div>
+
+          <div className="lib-image-side">
+            <div className="antique-frame">
+              <img src={banner} alt="Collection de livres anciens" />
+              <div className="frame-corner top-left"></div>
+              <div className="frame-corner bottom-right"></div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      {/* --- VALUES SECTION: Les Rayonnages --- */}
+      <section className="lib-section lib-values-bg">
+        <div className="lib-container">
+          <div className="lib-centered-header">
+             <GiBookshelf className="header-icon-gold" />
+            <h2 className="font-cairo">Les Piliers de notre <span className="text-gold">Collection</span></h2>
+            <p className="font-amiri section-sub">Les principes immuables qui guident chaque ajout à nos étagères.</p>
+          </div>
+          
+          <div className="lib-shelves-grid">
+            {/* Card 1 */}
+            <div className="shelf-card">
+              <div className="card-ornament-top"></div>
+              <div className="shelf-icon"><FaBookOpen /></div>
+              <h3 className="font-cairo">Authenticité Vérifiée</h3>
+              <p className="font-amiri">Comme un manuscrit ancien, chaque source est rigoureusement examinée pour sa conformité.</p>
+            </div>
+            
+            {/* Card 2 */}
+            <div className="shelf-card">
+              <div className="card-ornament-top"></div>
+              <div className="shelf-icon"><FaHandHoldingHeart /></div>
+              <h3 className="font-cairo">Soutien Communautaire</h3>
+              <p className="font-amiri">Nous sommes le mécène des auteurs et éditeurs qui préservent notre héritage intellectuel.</p>
+            </div>
+            
+            {/* Card 3 */}
+            <div className="shelf-card">
+              <div className="card-ornament-top"></div>
+              <div className="shelf-icon"><FaMedal /></div>
+              <h3 className="font-cairo">Qualité Précieuse</h3>
+              <p className="font-amiri">Une sélection premium, où la beauté du fond rencontre la noblesse de la forme.</p>
+            </div>
+            
+            {/* Card 4 */}
+            <div className="shelf-card">
+              <div className="card-ornament-top"></div>
+              <div className="shelf-icon"><FaGlobeAfrica /></div>
+              <h3 className="font-cairo">Savoir Sans Frontières</h3>
+              <p className="font-amiri">Une logistique pensée pour que la sagesse voyage de nos rayonnages à vos mains.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* --- COMMITMENT SECTION: Le Manuscrit Scellé --- */}
+      <section className="lib-section lib-commitment-vault">
+        <div className="lib-container">
+          <div className="illuminated-manuscript-box">
+            <h2 className="font-cairo title-gold">Notre Serment</h2>
+            <div className="manuscript-body font-amiri">
+              <p>
+                "Nous nous engageons solennellement à ne propager que ce qui élève l'esprit et apaise le cœur. Notre équipe examine chaque page avec la diligence d'un copiste d'antan, s'assurant que votre lecture soit un chemin sûr vers la compréhension."
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+export default About;

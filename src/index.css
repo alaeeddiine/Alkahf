@@ -1,0 +1,83 @@
+body {
+  margin: 0;
+  font-family: 'Cairo', sans-serif;
+  background-color: #F5f5dc; /* beige background */
+  color: #000; /* black text */
+}
+
+h1, h2, h3, h4, h5 {
+  font-family: 'Amiri', serif;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+  background-color: #000;
+  color: #f5f0e6;
+}
+
+.navbar a {
+  margin: 0 1rem;
+  color: #f5f0e6;
+}
+
+.footer {
+  text-align: center;
+  padding: 2rem 0;
+  background-color: #000;
+  color: #f5f0e6;
+}
+
+.button-gold {
+  background-color: #d4af37; /* gold */
+  border: none;
+  color: #000;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+.book-card {
+  border: 1px solid #d4af37;
+  border-radius: 10px;
+  padding: 1rem;
+  margin: 1rem;
+  text-align: center;
+  background-color: #fff8f0;
+}
+
+.books-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+/* Responsive for mobile <480px */
+@media (max-width: 480px) {
+  .navbar {
+    flex-direction: row;
+  }
+  .books-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2 livres par ligne */
+    gap: 1rem;
+  }
+  
+}
