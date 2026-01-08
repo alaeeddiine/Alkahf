@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useLocation } from 'react-router-dom';
 import { getAllBooks, getBooksByCategory } from "../firebase/config";
 import { CartContext } from "../context/CartContext";
 import { 
@@ -8,6 +8,9 @@ import {
 } from 'react-icons/fa';
 import { db } from "../firebase/config";
 import { collection, getDocs, query, where } from "firebase/firestore";
+
+const TAX_RATE = 21;
+const getPriceWithTax = (price) => +(price * (1 + TAX_RATE / 100)).toFixed(2);
 
 const Books = () => {
   const [books, setBooks] = useState([]);
@@ -19,14 +22,13 @@ const Books = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [searchParams] = useSearchParams();
   const { addToCart } = useContext(CartContext);
+  const location = useLocation();
 
   const [selectedBook, setSelectedBook] = useState(null);
   const [activeImgIdx, setActiveImgIdx] = useState(0);
 
-  // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const BOOKS_PER_PAGE = 12;
-
   const urlCategory = searchParams.get('category');
 
   const categories = [
@@ -44,7 +46,7 @@ const Books = () => {
     { value: "title", label: "Ordre alphabétique" }
   ];
 
-  // ---------- Récupérer les promos générales actives ----------
+  // ---------- Récupérer promos ----------
   const getGeneralPromos = async () => {
     const promosRef = collection(db, "promos");
     const q = query(promosRef, where("active", "==", true), where("type", "==", "general"));
@@ -52,35 +54,31 @@ const Books = () => {
     return snap.docs.map(d => ({ id: d.id, ...d.data() }));
   };
 
-  // ---------- Charger les livres avec promo appliquée ----------
+  // ---------- Charger les livres ----------
   useEffect(() => {
     const loadBooks = async () => {
       setLoading(true);
 
-      // 1. Récupérer les livres
       let data = (urlCategory && urlCategory !== "all") 
         ? await getBooksByCategory(urlCategory) 
         : await getAllBooks();
 
-      // 2. Récupérer les promos générales actives
+      data = data.filter(book => book.category !== "Livres enfants");
+
       const generalPromos = await getGeneralPromos();
       const applicablePromo = generalPromos.find(p => p.appliesTo === 'all' || p.appliesTo === 'books');
 
-      // 3. Appliquer la promo générale sur le prix original
       if (applicablePromo) {
         data = data.map(book => {
           const basePrice = book.price;
           let promoPrice;
-
           if (applicablePromo.amount.includes('%')) {
             const percent = parseFloat(applicablePromo.amount.replace('%', ''));
             promoPrice = +(basePrice * (1 - percent / 100)).toFixed(2);
           } else {
             promoPrice = +(basePrice - parseFloat(applicablePromo.amount)).toFixed(2);
           }
-
           promoPrice = promoPrice < 0 ? 0 : promoPrice;
-
           return { ...book, promoPrice };
         });
       }
@@ -88,10 +86,20 @@ const Books = () => {
       setBooks(data);
       setFilteredBooks(data);
       setLoading(false);
+
+      // ---------- Ouvrir le modal si location.state.bookId ----------
+      if (location.state?.bookId) {
+        const bookToOpen = data.find(b => b.id === location.state.bookId);
+        if (bookToOpen) {
+          setSelectedBook(bookToOpen);
+          setActiveImgIdx(0);
+          document.body.style.overflow = 'hidden';
+        }
+      }
     };
 
     loadBooks();
-  }, [urlCategory]);
+  }, [urlCategory, location.state]);
 
   // ---------- Filtrage et tri ----------
   useEffect(() => {
@@ -116,28 +124,15 @@ const Books = () => {
     setFilteredBooks(sorted);
   }, [searchTerm, selectedCategory, books, sortBy]);
 
-  // Reset page lors de filtrage / recherche
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm, selectedCategory, sortBy]);
+  useEffect(() => setCurrentPage(1), [searchTerm, selectedCategory, sortBy]);
 
-  // ---------- Pagination logique ----------
   const indexOfLastBook = currentPage * BOOKS_PER_PAGE;
   const indexOfFirstBook = indexOfLastBook - BOOKS_PER_PAGE;
   const currentBooks = filteredBooks.slice(indexOfFirstBook, indexOfLastBook);
   const totalPages = Math.ceil(filteredBooks.length / BOOKS_PER_PAGE);
 
-  // ---------- Gestion détails ----------
-  const openDetails = (book) => {
-    setSelectedBook(book);
-    setActiveImgIdx(0);
-    document.body.style.overflow = 'hidden';
-  };
-
-  const closeDetails = () => {
-    setSelectedBook(null);
-    document.body.style.overflow = 'auto';
-  };
+  const openDetails = (book) => { setSelectedBook(book); setActiveImgIdx(0); document.body.style.overflow = 'hidden'; };
+  const closeDetails = () => { setSelectedBook(null); document.body.style.overflow = 'auto'; };
 
   const renderStars = (rating = 5) => (
     <div className="rating-stars">
@@ -147,7 +142,6 @@ const Books = () => {
     </div>
   );
 
-  // ---------- Rendu ----------
   return (
     <div className="books-page">
       <div className="container-inner">
@@ -155,13 +149,9 @@ const Books = () => {
         <div className="books-tools">
           <div className="search-wrapper">
             <FaSearch className="search-icon" />
-            <input 
-              type="text" placeholder="Rechercher..." 
-              value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} 
-            />
+            <input type="text" placeholder="Rechercher..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
             {searchTerm && <FaTimes className="clear-search" onClick={() => setSearchTerm('')} />}
           </div>
-
           <div className="action-buttons">
             <button className="tool-btn" onClick={() => setShowFilters(!showFilters)}>
               <FaFilter /> <span>Filtres</span>
@@ -177,18 +167,18 @@ const Books = () => {
 
         {/* Drawer Filtres */}
         <div className={`filter-drawer ${showFilters ? 'open' : ''}`}>
-           <h3>Catégories</h3>
-           <div className="category-tags">
-             {categories.map(cat => (
-               <button 
-                 key={cat.value} 
-                 className={`tag-btn ${selectedCategory === cat.value ? 'active' : ''}`}
-                 onClick={() => { setSelectedCategory(cat.value); setShowFilters(false); }}
-               >
-                 {cat.label}
-               </button>
-             ))}
-           </div>
+          <h3>Catégories</h3>
+          <div className="category-tags">
+            {categories.map(cat => (
+              <button 
+                key={cat.value} 
+                className={`tag-btn ${selectedCategory === cat.value ? 'active' : ''}`}
+                onClick={() => { setSelectedCategory(cat.value); setShowFilters(false); }}
+              >
+                {cat.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Livres */}
@@ -204,11 +194,8 @@ const Books = () => {
                     <div className="book-image-container">
                       <img src={(book.images?.[0]) || book.image || "/placeholder.jpg"} alt={book.title} />
                       {book.featured && <span className="badge-gold">Populaire</span>}
-                      <div className="card-overlay">
-                         <button className="overlay-btn"><FaEye /></button>
-                      </div>
+                      <div className="card-overlay"><button className="overlay-btn"><FaEye /></button></div>
                     </div>
-
                     <div className="book-info">
                       <span className="book-category-tag">{book.category}</span>
                       <h3 className="book-title">{book.title}</h3>
@@ -217,20 +204,18 @@ const Books = () => {
                       <div className="book-card-footer">
                         {book.stock === 0 ? (
                           <>
-                            <span className="current-price">{book.price?.toFixed(2)} €</span>
-                            <button className="add-cart-mini disabled" disabled>
-                              <FaShoppingCart />
-                            </button>
-                            <p className="stock-warning">Stock épuisé – veuillez commander plus tard</p>
+                            <span className="current-price">{getPriceWithTax(book.price)} € TTC</span>
+                            <button className="add-cart-mini disabled" disabled><FaShoppingCart /></button>
+                            <p className="stock-warning">Stock épuisé</p>
                           </>
                         ) : (
                           <>
                             {book.promoPrice && book.promoPrice < book.price ? (
                               <span className="current-price">
-                                <s>{book.price.toFixed(2)} €</s> <strong>{book.promoPrice.toFixed(2)} €</strong>
+                                <s>{getPriceWithTax(book.price)} €</s> <strong>{getPriceWithTax(book.promoPrice)} €</strong>
                               </span>
                             ) : (
-                              <span className="current-price">{book.price?.toFixed(2)} €</span>
+                              <span className="current-price">{getPriceWithTax(book.price)} €</span>
                             )}
                             <button className="add-cart-mini" onClick={(e) => { e.stopPropagation(); addToCart(book); }}>
                               <FaShoppingCart />
@@ -243,34 +228,13 @@ const Books = () => {
                 ))}
               </div>
 
-              {/* Pagination */}
               {totalPages > 1 && (
                 <div className="pagination">
-                  <button
-                    className="page-btn"
-                    disabled={currentPage === 1}
-                    onClick={() => setCurrentPage(prev => prev - 1)}
-                  >
-                    Précédent
-                  </button>
-
+                  <button className="page-btn" disabled={currentPage === 1} onClick={() => setCurrentPage(prev => prev - 1)}>Précédent</button>
                   {[...Array(totalPages)].map((_, idx) => (
-                    <button
-                      key={idx}
-                      className={`page-btn ${currentPage === idx + 1 ? 'active' : ''}`}
-                      onClick={() => setCurrentPage(idx + 1)}
-                    >
-                      {idx + 1}
-                    </button>
+                    <button key={idx} className={`page-btn ${currentPage === idx + 1 ? 'active' : ''}`} onClick={() => setCurrentPage(idx + 1)}>{idx + 1}</button>
                   ))}
-
-                  <button
-                    className="page-btn"
-                    disabled={currentPage === totalPages}
-                    onClick={() => setCurrentPage(prev => prev + 1)}
-                  >
-                    Suivant
-                  </button>
+                  <button className="page-btn" disabled={currentPage === totalPages} onClick={() => setCurrentPage(prev => prev + 1)}>Suivant</button>
                 </div>
               )}
             </>
@@ -278,12 +242,11 @@ const Books = () => {
         </div>
       </div>
 
-      {/* Détails Livre */}
+      {/* Modal Détails Livre */}
       {selectedBook && (
         <div className="details-overlay" onClick={closeDetails}>
           <div className="details-modal" onClick={e => e.stopPropagation()}>
             <button className="close-details" onClick={closeDetails}><FaTimes /></button>
-            
             <div className="details-grid">
               <div className="details-gallery">
                 <div className="main-image-container book-main-img">
@@ -291,15 +254,10 @@ const Books = () => {
                 </div>
                 <div className="thumbnails-row">
                   {(selectedBook.images || [selectedBook.image]).map((img, idx) => (
-                    <img 
-                      key={idx} src={img} 
-                      className={activeImgIdx === idx ? "active-thumb" : ""} 
-                      onClick={() => setActiveImgIdx(idx)} alt="thumb"
-                    />
+                    <img key={idx} src={img} className={activeImgIdx === idx ? "active-thumb" : ""} onClick={() => setActiveImgIdx(idx)} alt="thumb" />
                   ))}
                 </div>
               </div>
-
               <div className="details-info">
                 <span className="overline">{selectedBook.category}</span>
                 <h2 className="details-title">{selectedBook.title}</h2>
@@ -307,40 +265,24 @@ const Books = () => {
                 <div className="details-price">
                   {selectedBook.promoPrice && selectedBook.promoPrice < selectedBook.price ? (
                     <>
-                      <s>{selectedBook.price.toFixed(2)} €</s> <strong>{selectedBook.promoPrice.toFixed(2)} €</strong>
+                      <s>{getPriceWithTax(selectedBook.price)} € TTC</s> <strong>{getPriceWithTax(selectedBook.promoPrice)} €</strong>
                     </>
                   ) : (
-                    <>{selectedBook.price?.toFixed(2)} €</>
+                    <>{getPriceWithTax(selectedBook.price)} €</> 
                   )}
                 </div>
-                
                 <div className="details-scroll-area">
-                  <p className="details-description">
-                    {selectedBook.description || "Aucune description disponible pour cet ouvrage."}
-                  </p>
+                  <p className="details-description">{selectedBook.description || "Aucune description disponible."}</p>
                   <div className="book-specs">
                     <div className="spec-item"><span>Format:</span> <strong>Relié</strong></div>
                     <div className="spec-item"><span>Langue:</span> <strong>{selectedBook.language || "N/A"}</strong></div>
                   </div>
                 </div>
-
                 <div className="details-actions">
-                  <button 
-                    className={`add-btn buy-btn-large ${selectedBook.stock === 0 ? "disabled" : ""}`} 
-                    disabled={selectedBook.stock === 0}
-                    onClick={() => {
-                      if (selectedBook.stock > 0) {
-                        addToCart(selectedBook);
-                        closeDetails();
-                      }
-                    }}
-                  >
-                    Ajouter au panier <FaShoppingCart style={{marginLeft: '10px'}}/>
+                  <button className={`add-btn buy-btn-large ${selectedBook.stock === 0 ? "disabled" : ""}`} disabled={selectedBook.stock === 0} onClick={() => { if(selectedBook.stock > 0) { addToCart(selectedBook); closeDetails(); } }}>
+                    Ajouter au panier <FaShoppingCart style={{marginLeft:'10px'}}/>
                   </button>
-                  {selectedBook.stock === 0 && <p className="stock-warning">Stock épuisé – veuillez commander plus tard</p>}
-                  {selectedBook.promoPrice && selectedBook.promoPrice < selectedBook.price && (
-                    <p className="promo-label">Promotion: {selectedBook.promoPrice.toFixed(2)} € au lieu de {selectedBook.price.toFixed(2)} €</p>
-                  )}
+                  {selectedBook.stock === 0 && <p className="stock-warning">Stock épuisé</p>}
                 </div>
               </div>
             </div>

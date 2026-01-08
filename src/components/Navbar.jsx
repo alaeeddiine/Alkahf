@@ -7,7 +7,8 @@ import {
   FaHome, 
   FaInfoCircle, 
   FaBook, 
-  FaBox 
+  FaBox,
+  FaChild
 } from "react-icons/fa";
 import { CartContext } from "../context/CartContext";
 import logo from "../assets/logo.png";
@@ -16,7 +17,7 @@ import { db } from "../firebase/config";
 
 const NAV_LINKS = [
   { path: "/", label: "Accueil", icon: <FaHome /> },
-  { path: "/books", label: "Librairie", icon: <FaBook /> },
+  { path: "/books", label: "Librairie", icon: <FaBook />, hasDropdown: true }, // dropdown
   { path: "/packs", label: "Packs", icon: <FaBox /> },
   { path: "/about", label: "À Propos", icon: <FaInfoCircle /> },
 ];
@@ -54,6 +55,7 @@ const Navbar = ({ onCartClick }) => {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [promos, setPromos] = useState([]);
   const [currentPromo, setCurrentPromo] = useState(0);
+  const [dropdownOpen, setDropdownOpen] = useState(false); // pour le menu Librairie
 
   const totalItems = useMemo(
     () => cartItems.reduce((sum, item) => sum + (item.quantity || 0), 0),
@@ -66,14 +68,13 @@ const Navbar = ({ onCartClick }) => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Fetch only active "general" promos and "announce"
+  // Fetch promos
   useEffect(() => {
     const q = query(
       collection(db, "promos"), 
       where("active", "==", true)
     );
     const unsub = onSnapshot(q, snap => {
-      // filter only general or announce
       const filtered = snap.docs
         .map(doc => ({ id: doc.id, ...doc.data() }))
         .filter(p => p.type === "general" || p.type === "announce");
@@ -83,7 +84,6 @@ const Navbar = ({ onCartClick }) => {
     return () => unsub();
   }, []);
 
-  // Promo slider interval
   useEffect(() => {
     if (promos.length <= 1) return;
     const interval = setInterval(
@@ -95,37 +95,28 @@ const Navbar = ({ onCartClick }) => {
 
   const formatPromoText = (promo) => {
     if (!promo) return null;
-
-    if (promo.type === "announce") {
-      return <strong>{promo.title}</strong>;
-    }
-
-    // type general
+    if (promo.type === "announce") return <strong>{promo.title}</strong>;
     const daysLeft = getRemainingDays(promo.endDate);
     return (
       <>
         <strong>{promo.title}</strong>
         {promo.amount && ` -${promo.amount}`}
         {` sur ${formatTarget(promo.appliesTo)}`}
-        {daysLeft !== null && (
-          ` | ⏳ Plus que ${daysLeft} jour${daysLeft > 1 ? "s" : ""}`
-        )}
+        {daysLeft !== null && ` | ⏳ Plus que ${daysLeft} jour${daysLeft > 1 ? "s" : ""}`}
       </>
     );
   };
 
   return (
     <>
-      {/* --- PROMO BAR --- */}
+      {/* PROMO BAR */}
       {promos.length > 0 && (
         <div className="royal-promo-bar">
-          <p className="promo-animate">
-            {formatPromoText(promos[currentPromo])}
-          </p>
+          <p className="promo-animate">{formatPromoText(promos[currentPromo])}</p>
         </div>
       )}
 
-      {/* --- MAIN NAVBAR --- */}
+      {/* MAIN NAVBAR */}
       <header className={`royal-navbar ${isScrolled ? "scrolled" : ""}`}>
         <div className="nav-container">
           
@@ -141,13 +132,27 @@ const Navbar = ({ onCartClick }) => {
           {/* DESKTOP LINKS */}
           <nav className="nav-desktop">
             {NAV_LINKS.map(link => (
-              <NavLink
-                key={link.path}
-                to={link.path}
-                className={({ isActive }) => isActive ? "active" : ""}
+              <div 
+                key={link.path} 
+                className="nav-item"
+                onMouseEnter={() => link.hasDropdown && setDropdownOpen(true)}
+                onMouseLeave={() => link.hasDropdown && setDropdownOpen(false)}
               >
-                {link.label}
-              </NavLink>
+                <NavLink
+                  to={link.path}
+                  className={({ isActive }) => isActive ? "active" : ""}
+                >
+                  {link.label}
+                </NavLink>
+
+                {/* Dropdown Librairie */}
+                {link.hasDropdown && dropdownOpen && (
+                  <div className="dropdown-menu">
+                    <Link to="/books" className="dropdown-item">Livres Adultes</Link>
+                    <Link to="/kids" className="dropdown-item">Livres Enfants</Link>
+                  </div>
+                )}
+              </div>
             ))}
           </nav>
 
@@ -155,48 +160,35 @@ const Navbar = ({ onCartClick }) => {
           <div className="nav-actions">
             <button className="action-btn cart" onClick={onCartClick}>
               <FaShoppingCart />
-              {totalItems > 0 && (
-                <span className="cart-badge">{totalItems}</span>
-              )}
+              {totalItems > 0 && <span className="cart-badge">{totalItems}</span>}
             </button>
-
-            <button
-              className="action-btn menu-toggle"
-              onClick={() => setIsMobileOpen(true)}
-            >
+            <button className="action-btn menu-toggle" onClick={() => setIsMobileOpen(true)}>
               <FaBars />
             </button>
           </div>
         </div>
       </header>
 
-      {/* --- MOBILE DRAWER --- */}
-      <div
-        className={`drawer-overlay ${isMobileOpen ? "show" : ""}`}
-        onClick={() => setIsMobileOpen(false)}
-      />
-
+      {/* MOBILE DRAWER */}
+      <div className={`drawer-overlay ${isMobileOpen ? "show" : ""}`} onClick={() => setIsMobileOpen(false)} />
       <aside className={`mobile-drawer ${isMobileOpen ? "open" : ""}`}>
         <div className="drawer-top">
           <img src={logo} alt="Logo" className="drawer-logo" />
-          <button
-            className="close-btn"
-            onClick={() => setIsMobileOpen(false)}
-          >
-            <FaTimes />
-          </button>
+          <button className="close-btn" onClick={() => setIsMobileOpen(false)}><FaTimes /></button>
         </div>
-
         <div className="drawer-links">
           {NAV_LINKS.map(link => (
-            <NavLink
-              key={link.path}
-              to={link.path}
-              onClick={() => setIsMobileOpen(false)}
-            >
-              <span className="icon">{link.icon}</span>
-              {link.label}
-            </NavLink>
+            <div key={link.path}>
+              <NavLink to={link.path} onClick={() => setIsMobileOpen(false)}>
+                <span className="icon">{link.icon}</span>{link.label}
+              </NavLink>
+              {link.hasDropdown && (
+                <div className="drawer-sub-links">
+                  <Link to="/books" onClick={() => setIsMobileOpen(false)}>Livres Adultes</Link>
+                  <Link to="/kids" onClick={() => setIsMobileOpen(false)}>Livres Enfants</Link>
+                </div>
+              )}
+            </div>
           ))}
         </div>
       </aside>

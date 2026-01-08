@@ -5,12 +5,16 @@ import { CartContext } from "../context/CartContext";
 import {
   FaStar,
   FaTimes,
-  FaPlus,
+  FaShoppingCart,
   FaShieldAlt,
   FaGlobe,
   FaGem,
   FaBoxOpen
 } from "react-icons/fa";
+
+// ----- UTILITAIRES TAXES -----
+const TAX_RATE = 21; // %
+const getPriceWithTax = (price) => +(price * (1 + TAX_RATE / 100)).toFixed(2);
 
 const PacksClient = () => {
   const [packs, setPacks] = useState([]);
@@ -80,6 +84,7 @@ const PacksClient = () => {
   const closeDetails = () => setSelectedPack(null);
 
   const getFinalPrice = (pack) => pack.promoPrice ?? pack.price;
+  const getFinalPriceTTC = (pack) => getPriceWithTax(getFinalPrice(pack));
 
   if (loading) {
     return (
@@ -137,11 +142,11 @@ const PacksClient = () => {
                 <div className="price-float">
                   {pack.promoPrice ? (
                     <>
-                      <s>{pack.price}€</s>{" "}
-                      <b>{pack.promoPrice}€</b>
+                      <s>{getPriceWithTax(pack.price)}€</s>{" "}
+                      <b>{getPriceWithTax(pack.promoPrice)}€</b>
                     </>
                   ) : (
-                    `${pack.price}€`
+                    `${getPriceWithTax(pack.price)}€`
                   )}
                 </div>
               </div>
@@ -170,7 +175,7 @@ const PacksClient = () => {
                       });
                     }}
                   >
-                    <FaPlus />
+                    <FaShoppingCart />
                   </button>
                 </div>
               </div>
@@ -224,9 +229,9 @@ const PacksClient = () => {
 
                   <div className="pack-price-tag">
                     <span className="currency">€</span>
-                    <span className="amount">{getFinalPrice(selectedPack)}</span>
+                    <span className="amount">{getFinalPriceTTC(selectedPack)}</span>
                     {selectedPack.promoPrice && (
-                      <span className="old-amount">{selectedPack.price}€</span>
+                      <span className="old-amount">{getPriceWithTax(selectedPack.price)}€</span>
                     )}
                   </div>
                 </div>
@@ -283,13 +288,13 @@ const PacksClient = () => {
                     onClick={() => {
                       addToCart({
                         ...selectedPack,
-                        price: getFinalPrice(selectedPack)
+                        price: getFinalPrice(selectedPack) // prix admin/base
                       });
                       closeDetails();
                     }}
                   >
                     <span>Ajouter au Panier</span>
-                    <span className="btn-price">{getFinalPrice(selectedPack)} €</span>
+                    <span className="btn-price">{getFinalPriceTTC(selectedPack)} €</span>
                   </button>
 
                   <p className="shipping-note">

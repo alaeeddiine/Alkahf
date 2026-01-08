@@ -24,6 +24,7 @@ const CATEGORIES = [
   "Sciences du Hadith",
   "Fiqh & Jurisprudence",
   "Sira & Biographies",
+  "Livres enfants",
 ];
 
 const LANGUAGES = ["arabic", "arabic/français", "français", "anglais", "arabic/anglais"];

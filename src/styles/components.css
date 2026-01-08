@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap');
+
 :root {
   --gold: #c7a049;
   --black: #121212;
@@ -72,9 +74,10 @@
 .nav-desktop a {
   text-decoration: none;
   color: var(--black);
+  font-family: 'Cairo', sans-serif;
   font-weight: 700;
-  font-size: 0.9rem;
-  text-transform: uppercase;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
   position: relative;
 }
 
@@ -88,7 +91,7 @@
 .nav-actions {
   display: flex;
   align-items: center;
-  gap: 15px; /* Espace précis entre les deux icônes */
+  gap: 15px;
 }
 
 .action-btn {
@@ -187,6 +190,66 @@
   font-size: 0.9rem;
   font-weight: 600;
 }
+
+/* --- DROPDOWN LIBRAIRIE --- */
+.nav-item {
+  position: relative; /* nécessaire pour le dropdown */
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%; /* juste en dessous du lien Librairie */
+  left: 0;
+  background: var(--white);
+  border: 1px solid var(--beige);
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  min-width: 180px;
+  padding: 10px 0;
+  z-index: 1000;
+}
+
+.dropdown-item {
+  padding: 8px 20px;
+  text-decoration: none;
+  color: var(--black);
+  font-weight: 600;
+  font-family: 'Cairo', sans-serif;
+  font-size: 0.95rem;
+  transition: background 0.2s, color 0.2s;
+}
+
+.dropdown-item:hover {
+  background: var(--beige);
+  color: var(--gold);
+  cursor: pointer;
+}
+
+/* --- MOBILE SUB-LINKS DANS LE DRAWER --- */
+.drawer-sub-links {
+  display: flex;
+  flex-direction: column;
+  margin-left: 15px;
+  margin-top: 5px;
+  gap: 8px;
+}
+
+.drawer-sub-links a {
+  text-decoration: none;
+  color: var(--black);
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.drawer-sub-links a:hover {
+  background: var(--beige);
+  color: var(--gold);
+}
+
 /* =========================================
    Premium Footer Styles
    ========================================= */

@@ -5,6 +5,7 @@ import {
   Route,
   Navigate,
   Outlet,
+  useLocation
 } from "react-router-dom";
 
 import Navbar from "./components/Navbar";
@@ -15,6 +16,7 @@ import AdminLayout from "./admin/AdminLayout";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Books from "./pages/Books";
+import KidsBooks from "./pages/KidsBooks";
 import Packs from "./pages/Packs";
 import Checkout from "./pages/Checkout"; 
 import LegalNotice from "./pages/LegalNotice";
@@ -34,6 +36,19 @@ import { CartProvider } from "./context/CartContext";
 import "./styles/components.css";
 import "./styles/pages.css";
 import "./styles/admin.css";
+
+/* ===============================
+   🔹 SCROLL TO TOP COMPONENT
+================================ */
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [pathname]);
+
+  return null;
+}
 
 /* ===============================
    🔹 PUBLIC LAYOUT
@@ -92,6 +107,7 @@ function App() {
   return (
     <CartProvider>
       <Router>
+        <ScrollToTop /> {/* ← Scroll automatique en haut pour toutes les pages */}
         <Routes>
           {/* 🔹 PUBLIC ROUTES */}
           <Route
@@ -106,6 +122,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
             <Route path="/books" element={<Books />} />
+            <Route path="/Kids" element={<KidsBooks />} />
             <Route path="/packs" element={<Packs />} />
             <Route path="/checkout" element={<Checkout />} /> 
             <Route path="/LegalNotice" element={<LegalNotice />} />

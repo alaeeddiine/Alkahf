@@ -20,6 +20,7 @@ import {
   serverTimestamp 
 } from 'firebase/firestore';
 import { db } from '../firebase/config';
+import heroVideo from "../assets/hero.mp4";
 
 const Home = () => {
   const [latestBooks, setLatestBooks] = useState([]);
@@ -35,7 +36,6 @@ const Home = () => {
     email: "",
     message: ""
   });
-
 
   // ---------- Newsletter ----------
   const handleNewsletterSubmit = async (e) => {
@@ -160,9 +160,23 @@ const Home = () => {
     <div className="home">
       {/* HERO SECTION */}
       <section className="hero">
+        <video
+          className="hero-video"
+          autoPlay
+          muted
+          loop
+          playsInline
+        >
+          <source src={heroVideo} type="video/mp4" />
+        </video>
         <div className="hero-content">
-          <h1>Découvrez la Sagesse Islamique <span className="highlight">à travers les Livres</span></h1>
-          <p>Explorez notre collection de livres authentiques sélectionnés par des savants renommés. Profitez d’une expérience enrichissante à chaque page.</p>
+          <h1>
+            La caverne fut un Refuge{" "}
+            <span className="highlight">pour les Croyants.</span>
+          </h1>   
+          <p>
+            Explorez notre collection de livres authentiques. Porfitez d'une expérience enrichissante à chaque page.
+          </p>
           <div className="hero-actions">
             <Link to="/books" className="btn btn-primary">
               <FaBookOpen /> Parcourir la collection <FaArrowRight />
@@ -178,8 +192,8 @@ const Home = () => {
       <section className="latest-books">
         <div className="container-inner">
           <div className="section-header">
-            <h2>Nouveaux Livres</h2>
-            <p className="section-subtitle">Découvrez nos derniers ajouts pour enrichir votre savoir spirituel et intellectuel.</p>
+            <h2>Nos Meilleurs Ventes</h2>
+            <p className="section-subtitle">Découvrez les incontournables de notre librairie</p>
           </div>
 
           {loading ? (
@@ -207,7 +221,15 @@ const Home = () => {
                         ) : formatPrice(book.price)}
                       </span>
                     </div>
-                    <Link to={`/books`} className="btn-outline-small">Voir les détails</Link>
+
+                    {/* --- Navigation vers Books/Kids avec bookId dans state --- */}
+                    <Link
+                      to={book.category === "Livres enfants" ? "/kids" : "/books"}
+                      state={{ bookId: book.id }}
+                      className="btn-outline-small"
+                    >
+                      Voir les détails
+                    </Link>
                   </div>
                 </div>
               ))}
@@ -331,88 +353,86 @@ const Home = () => {
             Laisser un avis
           </button>
 
-          {/* ---------- POPUP FORMULAIRE ---------- */}
-{showReview && (
-  <div className="popup-overlay">
-    <div className="popup-card floating-card">
-      <div className="popup-header">
-        <h2>Laisser un avis</h2>
-        <button className="close-btn" onClick={() => setShowReview(false)}>×</button>
-      </div>
+          {showReview && (
+            <div className="popup-overlay">
+              <div className="popup-card floating-card">
+                <div className="popup-header">
+                  <h2>Laisser un avis</h2>
+                  <button className="close-btn" onClick={() => setShowReview(false)}>×</button>
+                </div>
 
-      {!submitted ? (
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            console.log("Avis soumis:", reviewData);
-            setSubmitted(true);
-            setReviewData({ name: "", email: "", message: "" });
-          }}
-          className="popup-form"
-        >
-          <div className="input-group">
-            <label>Nom</label>
-            <input
-              type="text"
-              name="name"
-              value={reviewData.name}
-              onChange={(e) =>
-                setReviewData({ ...reviewData, name: e.target.value })
-              }
-              required
-              placeholder="Votre nom"
-            />
-          </div>
+                {!submitted ? (
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      console.log("Avis soumis:", reviewData);
+                      setSubmitted(true);
+                      setReviewData({ name: "", email: "", message: "" });
+                    }}
+                    className="popup-form"
+                  >
+                    <div className="input-group">
+                      <label>Nom</label>
+                      <input
+                        type="text"
+                        name="name"
+                        value={reviewData.name}
+                        onChange={(e) =>
+                          setReviewData({ ...reviewData, name: e.target.value })
+                        }
+                        required
+                        placeholder="Votre nom"
+                      />
+                    </div>
 
-          <div className="input-group">
-            <label>Email</label>
-            <input
-              type="email"
-              name="email"
-              value={reviewData.email}
-              onChange={(e) =>
-                setReviewData({ ...reviewData, email: e.target.value })
-              }
-              required
-              placeholder="Votre email"
-            />
-          </div>
+                    <div className="input-group">
+                      <label>Email</label>
+                      <input
+                        type="email"
+                        name="email"
+                        value={reviewData.email}
+                        onChange={(e) =>
+                          setReviewData({ ...reviewData, email: e.target.value })
+                        }
+                        required
+                        placeholder="Votre email"
+                      />
+                    </div>
 
-          <div className="input-group">
-            <label>Avis</label>
-            <textarea
-              name="message"
-              value={reviewData.message}
-              onChange={(e) =>
-                setReviewData({ ...reviewData, message: e.target.value })
-              }
-              required
-              placeholder="Votre avis"
-              rows={4}
-            />
-          </div>
+                    <div className="input-group">
+                      <label>Avis</label>
+                      <textarea
+                        name="message"
+                        value={reviewData.message}
+                        onChange={(e) =>
+                          setReviewData({ ...reviewData, message: e.target.value })
+                        }
+                        required
+                        placeholder="Votre avis"
+                        rows={4}
+                      />
+                    </div>
 
-          <button type="submit" className="submit-action-btn">
-            Envoyer
-          </button>
-        </form>
-      ) : (
-        <div className="confirmation-message">
-          <p>Merci pour votre avis ! Il a bien été envoyé.</p>
-          <button
-            onClick={() => setShowReview(false)}
-            className="submit-action-btn"
-          >
-            Fermer
-          </button>
-        </div>
-      )}
-    </div>
-  </div>
+                    <button type="submit" className="submit-action-btn">
+                      Envoyer
+                    </button>
+                  </form>
+                ) : (
+                  <div className="confirmation-message">
+                    <p>Merci pour votre avis ! Il a bien été envoyé.</p>
+                    <button
+                      onClick={() => setShowReview(false)}
+                      className="submit-action-btn"
+                    >
+                      Fermer
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
           )}
         </div>
       </section>
-
 
       {/* NEWSLETTER */}
       <section className="newsletter">

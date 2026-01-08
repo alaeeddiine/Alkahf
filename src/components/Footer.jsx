@@ -1,11 +1,9 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import {
-  FaFacebookF,
-  FaTwitter,
   FaInstagram,
   FaEnvelope,
-  FaPhone,
+  // FaPhone,
   FaMapMarkerAlt,
   FaChevronRight,
   FaStore,
@@ -23,8 +21,11 @@ const Footer = () => {
             <span>ALKAHF</span>
           </Link>
           <p className="footer-desc">
-            Votre destination d'excellence pour la littérature islamique authentique.
+            La caverne fut un Refuge pour les Croyants.
           </p>
+          <Link to="/books" className="footer-desc">
+            <span>Découvrez les incontournables de notre librairie</span>
+          </Link>
         </div>
 
         {/* Quick Links */}
@@ -32,8 +33,8 @@ const Footer = () => {
           <h4>Navigation</h4>
           <div className="gold-underline"></div>
           <ul>
-            <li><Link to="/"><FaChevronRight /> Accueil</Link></li>
             <li><Link to="/books"><FaChevronRight /> Librairie</Link></li>
+            <li><Link to="/kids"><FaChevronRight /> Librairie adultes</Link></li>
             <li><Link to="/packs"><FaChevronRight /> Packs Exclusifs</Link></li>
             <li><Link to="/about"><FaChevronRight /> À Propos</Link></li>
           </ul>
@@ -48,10 +49,10 @@ const Footer = () => {
               <FaMapMarkerAlt className="c-icon" />
               <p>Belgique</p>
             </div>
-            <div className="contact-item">
+            {/* <div className="contact-item">
               <FaPhone className="c-icon" />
               <p>+32 492 43 44 57</p>
-            </div>
+            </div> */}
             <div className="contact-item">
               <FaEnvelope className="c-icon" />
               <p>alkahf.be@gmail.com</p>

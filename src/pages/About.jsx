@@ -29,18 +29,25 @@ const About = () => {
           <div className="lib-content-side">
             <div className="lib-heading-group">
               <span className="section-tag font-cairo">Notre Vocation</span>
-              <h2 className="font-cairo">Tisser le lien du <span className="text-gold">Savoir</span></h2>
+              <h2 className="font-cairo">Bienvenue dans votre <span className="text-gold">“caverne”</span></h2>
             </div>
             
             <div className="lib-text-body font-amiri">
               <p className="drop-cap">
-                Chez Islamic Books, nous nous considérons comme les gardiens d'une bibliothèque vivante. Notre mission n'est pas seulement de vendre des livres, mais de rendre accessible un patrimoine.
-              </p>
+                Alkahf est un espace conçu pour tous ceux qui aspirent à nourrir leur esprit et approfondir leur compréhension.
+              </p>ici, vous trouverez une sélection précieuse d’ouvrages soigneusement choisis pour enrichir vos connaissances, que ce soit en ‘aqîda (croyance), en étude du qur’ân, à travers des récits prophétiques, ou bien plus encore.
               <p>
-                Nous sélectionnons des ouvrages dont l'encre porte la lumière de l'authenticité. Provenant de savants reconnus, chaque livre est une pierre ajoutée à l'édifice de la connaissance, pour les musulmans et les chercheurs de vérité.
+                chaque livre, chaque édition, est sélectionné
+                avec une attention particulière, dans le souci
+                de vous offrir un contenu fiable, bénéfique et
+                authentique.
+
+                que cette quête du savoir soit pour vous une
+                source de patience, de lumière et de
+                satisfaction.              
               </p>
             </div>
-            <div className="lib-signature font-amiri">— Les Bibliothécaires d'Alkahf</div>
+            <div className="lib-signature font-amiri">Les Bibliothécaires d'Alkahf</div>
           </div>
 
           <div className="lib-image-side">
