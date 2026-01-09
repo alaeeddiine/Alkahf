@@ -18,7 +18,7 @@ const Footer = () => {
         <div className="footer-brand">
           <Link to="/" className="footer-logo">
             <img src={logo} alt="Alkahf Logo" />
-            <span>ALKAHF</span>
+            <span>AL KAHF</span>
           </Link>
           <p className="footer-desc">
             La caverne fut un Refuge pour les Croyants.

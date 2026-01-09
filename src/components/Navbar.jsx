@@ -124,7 +124,7 @@ const Navbar = ({ onCartClick }) => {
           <Link to="/" className="nav-logo">
             <img src={logo} alt="Logo" />
             <div className="logo-text">
-              <span className="brand">ALKAHF</span>
+              <span className="brand">AL KAHF</span>
               <span className="arabic">مكتبة الكهف</span>
             </div>
           </Link>

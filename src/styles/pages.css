@@ -1260,6 +1260,107 @@ h2 { font-size: 2rem; text-align: center; margin-bottom: 1rem; text-transform: u
   color: var(--light-gray);
   border-color: var(--beige-dark);
 }
+/* --- BANNER HERO --- */
+.kids-hero-banner {
+  position: relative;
+  width: 100%;
+  height: 300px; /* Ajuste la hauteur selon ton goût */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  margin-bottom: 30px;
+}
+
+.hero-bg-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  filter: blur(8px); /* L'effet de flou */
+  transform: scale(1.1); /* Pour éviter les bords blancs du flou */
+  z-index: 1;
+}
+
+.hero-bg-container::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(255, 255, 255, 0.2); /* Voile léger pour faire ressortir le logo */
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+}
+
+.books-logo-main {
+  max-width: 180px;
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,0.1));
+}
+
+.hero-text {
+  color: #2c3e50;
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-top: 10px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+/* --- CARD STYLE (PAS DE FLIP) --- */
+.book-card {
+  background: #fff;
+  border-radius: 15px;
+  border: 1px solid #eee;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.book-card:hover {
+  transform: translateY(-8px); /* Soulèvement simple */
+  box-shadow: 0 12px 25px rgba(0,0,0,0.08);
+}
+
+/* --- PRIX ET SOLDE --- */
+.price-box {
+  display: flex;
+  flex-direction: column;
+}
+
+.old-price-line {
+  text-decoration: line-through;
+  color: #999;
+  font-size: 0.85rem;
+  margin-bottom: -4px;
+}
+
+.current-price-kids {
+  font-weight: 800;
+  color: #e74c3c; /* Rouge pour attirer l'oeil sur le prix */
+  font-size: 1.1rem;
+}
+
+/* --- MODAL --- */
+.details-price-kids {
+  font-size: 1.5rem;
+  margin: 15px 0;
+}
+
+.details-price-kids s {
+  color: #bbb;
+  margin-right: 10px;
+  font-size: 1.1rem;
+}
+
+.details-price-kids strong {
+  color: #27ae60;
+  font-weight: 900;
+}
 
 
 /* =========================================
@@ -1784,16 +1885,22 @@ h2 { font-size: 2rem; text-align: center; margin-bottom: 1rem; text-transform: u
 }
 
 /* Lettrine (Drop Cap) */
-.drop-cap::first-letter {
+.drop-cap {
+  overflow: hidden;
+}
+
+.drop-word {
   float: left;
   font-family: var(--font-cairo);
-  font-size: 4.5rem;
-  line-height: 0.8;
+  font-size: 2rem;
+  line-height: 0.85;
   font-weight: 900;
   color: var(--lib-gold);
   padding-right: 15px;
-  padding-top: 5px;
+  padding-top: 6px;
+  text-transform: uppercase;
 }
+
 
 .lib-signature {
   font-style: italic;
@@ -2053,7 +2160,6 @@ h2 { font-size: 2rem; text-align: center; margin-bottom: 1rem; text-transform: u
 
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* --- PACK PAGE HERO --- */
 /* =========================================
    PACKS PAGE - CINEMATIC PREMIUM DESIGN
    Style: Beige / Noir / Gold

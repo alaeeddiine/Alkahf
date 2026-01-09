@@ -1,181 +1,151 @@
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { 
-  FaArrowRight, 
-  FaBookOpen, 
-  FaFire, 
-  FaShieldAlt, 
-  FaShippingFast, 
-  FaHeadset, 
-  FaEnvelope 
-} from 'react-icons/fa';
-import { 
-  collection, 
-  query, 
-  orderBy, 
-  limit, 
-  getDocs, 
-  addDoc, 
-  where, 
-  serverTimestamp 
-} from 'firebase/firestore';
-import { db } from '../firebase/config';
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import {
+  FaArrowRight,
+  FaBookOpen,
+  FaFire,
+  FaShieldAlt,
+  FaShippingFast,
+  FaHeadset,
+  FaEnvelope,
+} from "react-icons/fa";
+import {
+  collection,
+  query,
+  orderBy,
+  limit,
+  getDocs,
+  addDoc,
+  where,
+  serverTimestamp,
+} from "firebase/firestore";
+import { db } from "../firebase/config";
 import heroVideo from "../assets/hero.mp4";
 
 const Home = () => {
   const [latestBooks, setLatestBooks] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [newsletterEmail, setNewsletterEmail] = useState('');
-  const [newsletterMessage, setNewsletterMessage] = useState('');
+  const [newsletterEmail, setNewsletterEmail] = useState("");
+  const [newsletterMessage, setNewsletterMessage] = useState("");
   const [exclusivePack, setExclusivePack] = useState(null);
   const [loadingPack, setLoadingPack] = useState(true);
   const [showReview, setShowReview] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [videoReady, setVideoReady] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
+
   const [reviewData, setReviewData] = useState({
     name: "",
     email: "",
-    message: ""
+    message: "",
   });
+
+  // ---------- iOS Detection ----------
+  useEffect(() => {
+    const ua = window.navigator.userAgent.toLowerCase();
+    setIsIOS(/iphone|ipad|ipod/.test(ua));
+  }, []);
 
   // ---------- Newsletter ----------
   const handleNewsletterSubmit = async (e) => {
     e.preventDefault();
     try {
-      await addDoc(collection(db, 'newsletter'), {
+      await addDoc(collection(db, "newsletter"), {
         email: newsletterEmail,
-        createdAt: serverTimestamp()
+        createdAt: serverTimestamp(),
       });
       setNewsletterMessage("Merci ! Votre email a été enregistré.");
-      setNewsletterEmail('');
-    } catch (error) {
-      console.error("Erreur newsletter :", error);
+      setNewsletterEmail("");
+    } catch {
       setNewsletterMessage("Une erreur est survenue. Veuillez réessayer.");
     }
   };
 
-  // ---------- Utilitaire promo ----------
-  const applyPromo = (originalPrice, promo) => {
-    if (!promo) return originalPrice;
-    let promoPrice;
-    if (promo.amount.includes('%')) {
-      const percent = parseFloat(promo.amount.replace('%', ''));
-      promoPrice = +(originalPrice * (1 - percent / 100)).toFixed(2);
-    } else {
-      promoPrice = +(originalPrice - parseFloat(promo.amount)).toFixed(2);
+  // ---------- Promo utils ----------
+  const applyPromo = (price, promo) => {
+    if (!promo) return price;
+    if (promo.amount.includes("%")) {
+      return +(price * (1 - parseFloat(promo.amount) / 100)).toFixed(2);
     }
-    return promoPrice < 0 ? 0 : promoPrice;
+    return Math.max(0, +(price - parseFloat(promo.amount)).toFixed(2));
   };
 
-  // ---------- Récupérer promos générales ----------
   const getGeneralPromos = async () => {
-    const promosRef = collection(db, "promos");
-    const q = query(promosRef, where("active", "==", true), where("type", "==", "general"));
+    const q = query(
+      collection(db, "promos"),
+      where("active", "==", true),
+      where("type", "==", "general")
+    );
     const snap = await getDocs(q);
-    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
   };
 
-  // ---------- Fetch Latest Books ----------
+  // ---------- Fetch Books ----------
   useEffect(() => {
-    const fetchLatestBooks = async () => {
-      try {
-        setLoading(true);
-        const q = query(collection(db, 'books'), orderBy('createdAt', 'desc'), limit(4));
-        const snap = await getDocs(q);
-        let booksData = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-        const generalPromos = await getGeneralPromos();
-        const applicablePromo = generalPromos.find(p => p.appliesTo === 'all' || p.appliesTo === 'books');
-
-        if (applicablePromo) {
-          booksData = booksData.map(book => ({
-            ...book,
-            promoPrice: applyPromo(book.price, applicablePromo)
-          }));
-        }
-
-        setLatestBooks(booksData);
-      } catch (error) {
-        console.error("Erreur chargement des livres :", error);
-      } finally {
-        setLoading(false);
+    (async () => {
+      setLoading(true);
+      const snap = await getDocs(
+        query(collection(db, "books"), orderBy("createdAt", "desc"), limit(4))
+      );
+      let books = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      const promos = await getGeneralPromos();
+      const promo = promos.find((p) => p.appliesTo === "all" || p.appliesTo === "books");
+      if (promo) {
+        books = books.map((b) => ({
+          ...b,
+          promoPrice: applyPromo(b.price, promo),
+        }));
       }
-    };
-    fetchLatestBooks();
+      setLatestBooks(books);
+      setLoading(false);
+    })();
   }, []);
 
-  // ---------- Fetch Latest Pack ----------
+  // ---------- Fetch Pack ----------
   useEffect(() => {
-    const fetchLatestPack = async () => {
-      try {
-        const q = query(
-          collection(db, 'packs'),
-          orderBy('createdAt', 'desc'),
-          limit(1)
-        );
-        const snap = await getDocs(q);
-
-        if (!snap.empty) {
-          let pack = { id: snap.docs[0].id, ...snap.docs[0].data() };
-
-          const generalPromos = await getGeneralPromos();
-          const applicablePromo = generalPromos.find(p => p.appliesTo === 'all' || p.appliesTo === 'packs');
-
-          if (applicablePromo) {
-            pack = {
-              ...pack,
-              promoPrice: applyPromo(pack.price, applicablePromo)
-            };
-          }
-
-          setExclusivePack(pack);
-        }
-      } catch (error) {
-        console.error("Erreur chargement pack exclusif :", error);
-      } finally {
-        setLoadingPack(false);
+    (async () => {
+      const snap = await getDocs(
+        query(collection(db, "packs"), orderBy("createdAt", "desc"), limit(1))
+      );
+      if (!snap.empty) {
+        let pack = { id: snap.docs[0].id, ...snap.docs[0].data() };
+        const promos = await getGeneralPromos();
+        const promo = promos.find((p) => p.appliesTo === "all" || p.appliesTo === "packs");
+        if (promo) pack.promoPrice = applyPromo(pack.price, promo);
+        setExclusivePack(pack);
       }
-    };
-    fetchLatestPack();
+      setLoadingPack(false);
+    })();
   }, []);
 
-  // ---------- Price formatter ----------
-  const formatPrice = (price) => new Intl.NumberFormat('fr-FR', { 
-    style: 'currency', 
-    currency: 'EUR' 
-  }).format(price);
-
-  // ---------- Reviews carousel ----------
-  useEffect(() => {
-    const grid = document.querySelector('.reviews-grid');
-    const next = document.querySelector('.reviews-arrow.next');
-    const prev = document.querySelector('.reviews-arrow.prev');
-    if (!grid || !next || !prev) return;
-
-    const scrollAmount = grid.offsetWidth * 0.9;
-    next.addEventListener('click', () => grid.scrollBy({ left: scrollAmount, behavior: 'smooth' }));
-    prev.addEventListener('click', () => grid.scrollBy({ left: -scrollAmount, behavior: 'smooth' }));
-  }, []);
+  const formatPrice = (p) =>
+    new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" }).format(p);
 
   return (
     <div className="home">
-      {/* HERO SECTION */}
-      <section className="hero">
-        <video
-          className="hero-video"
-          autoPlay
-          muted
-          loop
-          playsInline
-        >
-          <source src={heroVideo} type="video/mp4" />
-        </video>
+      {/* HERO */}
+      <section className={`hero ${videoReady ? "video-loaded" : ""}`}>
+        {!isIOS && (
+          <video
+            className="hero-video"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            onCanPlayThrough={() => setVideoReady(true)}
+          >
+            <source src={heroVideo} type="video/mp4" />
+          </video>
+        )}
+
         <div className="hero-content">
           <h1>
-            La caverne fut un Refuge{" "}
-            <span className="highlight">pour les Croyants.</span>
-          </h1>   
+            La caverne fut un Refuge <span className="highlight">pour les Croyants.</span>
+          </h1>
           <p>
-            Explorez notre collection de livres authentiques. Porfitez d'une expérience enrichissante à chaque page.
+            Explorez notre collection de livres authentiques. Profitez d'une expérience
+            enrichissante à chaque page.
           </p>
           <div className="hero-actions">
             <Link to="/books" className="btn btn-primary">

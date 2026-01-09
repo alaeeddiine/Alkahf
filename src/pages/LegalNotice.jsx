@@ -28,9 +28,8 @@ const LegalNotice = () => {
         <div className="legal-card">
           <h2>Hébergement</h2>
           <p>
-            Hébergeur : *Privé*<br />
-            Adresse : Adresse complète<br />
-            Site web : www.Alkahf.be
+            Hébergeur : combell<br />
+            Site web : www.combell.com/fr
           </p>
         </div>
 

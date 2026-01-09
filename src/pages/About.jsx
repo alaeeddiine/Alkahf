@@ -12,11 +12,11 @@ const About = () => {
         <div className="lib-container hero-content-flex">
           <div className="hero-text-block">
             <span className="lib-overtitle font-cairo">مكتبة الكهف</span>
-            <h1 className="font-cairo">L'Héritage d'<span className="gold-highlight">Alkahf</span></h1>
+            <h1 className="font-cairo">L'Héritage d'<span className="gold-highlight">Al Kahf</span></h1>
             <div className="lib-separator-ornament"><GiScrollUnfurled /></div>
             <p className="font-amiri">
-              "Le livre est comme un jardin porté dans la poche." <br/>
-              Votre sanctuaire pour une littérature islamique authentique, curatée avec sagesse.
+              "Un chemin vers la connaissance." <br/>
+              Des ouvrages islamiques authentiques, choisis avec science et sincérité, au service de la foi et de la compréhension.
             </p>
           </div>
         </div>
@@ -34,7 +34,7 @@ const About = () => {
             
             <div className="lib-text-body font-amiri">
               <p className="drop-cap">
-                Alkahf est un espace conçu pour tous ceux qui aspirent à nourrir leur esprit et approfondir leur compréhension.
+                <span className="drop-word">Alkahf</span> est un espace conçu pour tous ceux qui aspirent à nourrir leur esprit et approfondir leur compréhension.
               </p>ici, vous trouverez une sélection précieuse d’ouvrages soigneusement choisis pour enrichir vos connaissances, que ce soit en ‘aqîda (croyance), en étude du qur’ân, à travers des récits prophétiques, ou bien plus encore.
               <p>
                 chaque livre, chaque édition, est sélectionné
@@ -110,10 +110,12 @@ const About = () => {
       <section className="lib-section lib-commitment-vault">
         <div className="lib-container">
           <div className="illuminated-manuscript-box">
-            <h2 className="font-cairo title-gold">Notre Serment</h2>
+            <h2 className="font-cairo title-gold">NOTRE ENGAGEMENT</h2>
             <div className="manuscript-body font-amiri">
               <p>
-                "Nous nous engageons solennellement à ne propager que ce qui élève l'esprit et apaise le cœur. Notre équipe examine chaque page avec la diligence d'un copiste d'antan, s'assurant que votre lecture soit un chemin sûr vers la compréhension."
+                Notre mission est simple : <br />
+                vous proposer un savoir bénéfique, fiable
+                et accessible à tous.
               </p>
             </div>
           </div>
