@@ -183,7 +183,7 @@ const Checkout = () => {
             <div className="summary-calculation">
               <div className="calc-row"><span>Sous-total (TTC)</span><span>{totals.subtotal.toFixed(2)}€</span></div>
               <div className="calc-row"><span>Frais d'envoi</span><span>{totals.shipping === 0 ? "Offerts" : `${totals.shipping.toFixed(2)}€`}</span></div>
-              <div className="calc-row"><span>Taxe (21%) incluse</span><span>{totals.tax.toFixed(2)}€</span></div>
+              {/* <div className="calc-row"><span>Taxe (21%) incluse</span><span>{totals.tax.toFixed(2)}€</span></div> */}
               {promoDiscount > 0 && <div className="calc-row discount-row"><span>Réduction</span><span>-{promoDiscount.toFixed(2)}€</span></div>}
               <div className="calc-row grand-total-row"><span>Total</span><span>{totals.grandTotal.toFixed(2)}€</span></div>
             </div>
