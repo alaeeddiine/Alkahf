@@ -22,6 +22,9 @@ const PacksClient = () => {
   const [selectedPack, setSelectedPack] = useState(null);
   const [activeImgIdx, setActiveImgIdx] = useState(0);
   const { addToCart } = useContext(CartContext);
+  const [currentPage, setCurrentPage] = useState(1);
+  const PACKS_PER_PAGE = 6;
+
 
   // ---------- Récupérer les promos générales actives ----------
   const getGeneralPromos = async () => {
@@ -75,6 +78,12 @@ const PacksClient = () => {
     document.body.classList.toggle("modal-open", !!selectedPack);
     return () => document.body.classList.remove("modal-open");
   }, [selectedPack]);
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  }, [currentPage]);
 
   const openDetails = (pack) => {
     setSelectedPack(pack);
@@ -93,6 +102,10 @@ const PacksClient = () => {
       </div>
     );
   }
+  const indexOfLastPack = currentPage * PACKS_PER_PAGE;
+  const indexOfFirstPack = indexOfLastPack - PACKS_PER_PAGE;
+  const currentPacks = packs.slice(indexOfFirstPack, indexOfLastPack);
+  const totalPages = Math.ceil(packs.length / PACKS_PER_PAGE);
 
   return (
     <div className="cinematic-page">
@@ -106,14 +119,6 @@ const PacksClient = () => {
           <p>
             Plongez dans des univers thématiques curatés pour illuminer votre esprit.
           </p>
-          <div className="hero-stats">
-            <div className="stat">
-              <span>{packs.length}</span> Éditions
-            </div>
-            <div className="stat">
-              <span>Exclusif</span> Qualité
-            </div>
-          </div>
         </div>
       </header>
 
@@ -121,7 +126,7 @@ const PacksClient = () => {
         <h2 className="grid-label">Séries Disponibles</h2>
 
         <div className="cinematic-grid">
-          {packs.map((pack) => (
+          {currentPacks.map(pack => (
             <div
               key={pack.id}
               className="cinematic-card"
@@ -182,6 +187,35 @@ const PacksClient = () => {
             </div>
           ))}
         </div>
+        {totalPages > 1 && (
+        <div className="pagination">
+          <button
+            className="page-btn"
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage(p => p - 1)}
+          >
+            Précédent
+          </button>
+
+          {[...Array(totalPages)].map((_, idx) => (
+            <button
+              key={idx}
+              className={`page-btn ${currentPage === idx + 1 ? "active" : ""}`}
+              onClick={() => setCurrentPage(idx + 1)}
+            >
+              {idx + 1}
+            </button>
+          ))}
+
+          <button
+            className="page-btn"
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage(p => p + 1)}
+          >
+            Suivant
+          </button>
+        </div>
+      )}
       </main>
 
       {selectedPack && (

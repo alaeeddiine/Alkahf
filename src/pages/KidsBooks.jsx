@@ -74,6 +74,13 @@ const KidsBooks = () => {
     setFilteredBooks(result);
     setCurrentPage(1);
   }, [searchTerm, sortBy, books]);
+  
+  useEffect(() => {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+    }, [currentPage]);
 
   const indexOfLastBook = currentPage * BOOKS_PER_PAGE;
   const indexOfFirstBook = indexOfLastBook - BOOKS_PER_PAGE;
@@ -228,32 +235,14 @@ const KidsBooks = () => {
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="pagination">
-                <button
-                  disabled={currentPage === 1}
-                  onClick={() => setCurrentPage(p => p - 1)}
-                >
-                  Précédent
-                </button>
-
-                {[...Array(totalPages)].map((_, idx) => (
-                  <button
-                    key={idx}
-                    className={currentPage === idx + 1 ? 'active' : ''}
-                    onClick={() => setCurrentPage(idx + 1)}
-                  >
-                    {idx + 1}
-                  </button>
-                ))}
-
-                <button
-                  disabled={currentPage === totalPages}
-                  onClick={() => setCurrentPage(p => p + 1)}
-                >
-                  Suivant
-                </button>
-              </div>
-            )}
+                <div className="pagination">
+                  <button className="page-btn" disabled={currentPage === 1} onClick={() => setCurrentPage(prev => prev - 1)}>Précédent</button>
+                  {[...Array(totalPages)].map((_, idx) => (
+                    <button key={idx} className={`page-btn ${currentPage === idx + 1 ? 'active' : ''}`} onClick={() => setCurrentPage(idx + 1)}>{idx + 1}</button>
+                  ))}
+                  <button className="page-btn" disabled={currentPage === totalPages} onClick={() => setCurrentPage(prev => prev + 1)}>Suivant</button>
+                </div>
+              )}
           </>
         )}
       </div>
@@ -325,6 +314,14 @@ const KidsBooks = () => {
                   >
                     Ajouter au panier <FaShoppingCart style={{ marginLeft: 10 }} />
                   </button>
+                </div>
+                {/* 🔒 Politique de retour */}
+                <div className="return-policy">
+                  <span className="return-icon">📦</span>
+                  <p>
+                    <strong>Politique retours</strong> Vous disposez de 14 jours pour retourner
+                    votre colis après sa réception.
+                  </p>
                 </div>
               </div>
             </div>

@@ -25,6 +25,8 @@ const CATEGORIES = [
   "Fiqh & Jurisprudence",
   "Sira & Biographies",
   "Livres enfants",
+  "Tawhid ",
+  "Aqida & Croyances"
 ];
 
 const LANGUAGES = ["arabic", "arabic/français", "français", "anglais", "arabic/anglais"];
@@ -260,6 +262,15 @@ const AdminBooks = () => {
                   required
                   value={form.title}
                   onChange={(e) => setForm({ ...form, title: e.target.value })}
+                />
+              </div>
+
+              <div className="input-group">
+                <label>Edition</label>
+                <input
+                  required
+                  value={form.edition}
+                  onChange={(e) => setForm({ ...form, edition: e.target.value })}
                 />
               </div>
 

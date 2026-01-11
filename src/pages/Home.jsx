@@ -22,6 +22,11 @@ import {
 import { db } from "../firebase/config";
 import heroVideo from "../assets/hero.mp4";
 
+/* ---------- TAX UTILS (IDENTIQUE À PACKS) ---------- */
+const TAX_RATE = 21;
+const getPriceWithTax = (price) =>
+  +(price * (1 + TAX_RATE / 100)).toFixed(2);
+
 const Home = () => {
   const [latestBooks, setLatestBooks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -33,7 +38,6 @@ const Home = () => {
   const [submitted, setSubmitted] = useState(false);
   const [videoReady, setVideoReady] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
-
   const [reviewData, setReviewData] = useState({
     name: "",
     email: "",
@@ -60,6 +64,23 @@ const Home = () => {
       setNewsletterMessage("Une erreur est survenue. Veuillez réessayer.");
     }
   };
+  const reviews = [
+    { message: "Un service client exceptionnel et des livres d'une qualité rare.", author: "Youssef B.", rating: 5 },
+    { message: "Enfin une librairie en ligne qui garantit l'authenticité des sources.", author: "Leila K.", rating: 5 },
+    { message: "La livraison est ultra rapide et les livres arrivent très bien protégés.", author: "Ahmed M.", rating: 4 },
+    { message: "Une sélection de livres magnifique, surtout les biographies.", author: "Fatima Z.", rating: 5 },
+    { message: "Le site est très fluide sur mobile, l'expérience d'achat est vraiment agréable.", author: "Omar S.", rating: 4 },
+  ];
+  
+  const StarRating = ({ rating }) => (
+    <div className="stars">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <span key={star} className={star <= rating ? "star filled" : "star"}>
+          ★
+        </span>
+      ))}
+    </div>
+  );
 
   // ---------- Promo utils ----------
   const applyPromo = (price, promo) => {
@@ -191,8 +212,6 @@ const Home = () => {
                         ) : formatPrice(book.price)}
                       </span>
                     </div>
-
-                    {/* --- Navigation vers Books/Kids avec bookId dans state --- */}
                     <Link
                       to={book.category === "Livres enfants" ? "/kids" : "/books"}
                       state={{ bookId: book.id }}
@@ -209,45 +228,63 @@ const Home = () => {
       </section>
 
       {/* EXCLUSIVE PACK */}
+      {/* EXCLUSIVE PACK */}
       <section className="exclusive-mini-luxe">
         <div className="mesh-gradient-subtle"></div>
         <div className="container-compact">
           <div className="mini-branding">
             <span className="gold-label">ÉDITION SIGNATURE</span>
-            <h2 className="mini-title-luxe">L'Exclusivité <span className="serif-italic">Alkahf</span></h2>
+            <h2 className="mini-title-luxe">
+              L'Exclusivité <span className="serif-italic">Alkahf</span>
+            </h2>
           </div>
 
           {loadingPack ? (
             <div className="mini-shimmer"></div>
-          ) : exclusivePack && (
-            <div className="mini-luxury-card">
-              <div className="card-inner-flex">
-                <div className="mini-visual">
-                  <img src={exclusivePack.images?.[0] || exclusivePack.image} alt={exclusivePack.title} />
-                </div>
-                <div className="mini-content">
-                  <div className="text-top">
-                    <h3 className="pack-name">{exclusivePack.title}</h3>
-                    <p className="pack-summary">{exclusivePack.description}</p>
+          ) : (
+            exclusivePack && (
+              <div className="mini-luxury-card">
+                <div className="card-inner-flex">
+                  <div className="mini-visual">
+                    <img
+                      src={exclusivePack.images?.[0] || exclusivePack.image}
+                      alt={exclusivePack.title}
+                    />
                   </div>
-                  <div className="mini-action-row">
-                    <div className="price-minimal">
-                      {exclusivePack.promoPrice && exclusivePack.promoPrice < exclusivePack.price ? (
-                        <>
-                          <span className="price-old">{exclusivePack.price}€</span>
-                          <span className="price-val">{exclusivePack.promoPrice}€</span>
-                        </>
-                      ) : (
-                        <span className="price-val">{exclusivePack.price}€</span>
-                      )}
+
+                  <div className="mini-content">
+                    <div className="text-top">
+                      <h3 className="pack-name">{exclusivePack.title}</h3>
+                      <p className="pack-summary">{exclusivePack.description}</p>
                     </div>
-                    <Link to={`/packs`} className="mini-cta-black">
-                      Découvrir <FaArrowRight />
-                    </Link>
+
+                    <div className="mini-action-row">
+                      <div className="price-minimal">
+                        {exclusivePack.promoPrice &&
+                        exclusivePack.promoPrice < exclusivePack.price ? (
+                          <>
+                            <span className="price-old">
+                              {formatPrice(getPriceWithTax(exclusivePack.price))}
+                            </span>
+                            <span className="price-val">
+                              {formatPrice(getPriceWithTax(exclusivePack.promoPrice))}
+                            </span>
+                          </>
+                        ) : (
+                          <span className="price-val">
+                            {formatPrice(getPriceWithTax(exclusivePack.price))}
+                          </span>
+                        )}
+                      </div>
+
+                      <Link to="/packs" className="mini-cta-black">
+                        Découvrir <FaArrowRight />
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            )
           )}
         </div>
       </section>
@@ -291,26 +328,13 @@ const Home = () => {
           </p>
 
           <div className="reviews-grid">
-            <div className="review-card">
-              <p>"Un service client exceptionnel et des livres d'une qualité rare."</p>
-              <span>- Youssef B.</span>
-            </div>
-            <div className="review-card">
-              <p>"Enfin une librairie en ligne qui garantit l'authenticité des sources."</p>
-              <span>- Leila K.</span>
-            </div>
-            <div className="review-card">
-              <p>"La livraison est ultra rapide et les livres arrivent très bien protégés."</p>
-              <span>- Ahmed M.</span>
-            </div>
-            <div className="review-card">
-              <p>"Une sélection de livres magnifique, surtout les biographies."</p>
-              <span>- Fatima Z.</span>
-            </div>
-            <div className="review-card">
-              <p>"Le site est très fluide sur mobile, l'expérience d'achat est vraiment agréable."</p>
-              <span>- Omar S.</span>
-            </div>
+            {reviews.map((review, index) => (
+              <div className="review-card" key={index}>
+                <StarRating rating={review.rating} />
+                <p>"{review.message}"</p>
+                <span>- {review.author}</span>
+              </div>
+            ))}
           </div>
 
           <button className="reviews-arrow prev" aria-label="Avis précédent">‹</button>
@@ -382,7 +406,21 @@ const Home = () => {
                         rows={4}
                       />
                     </div>
-
+                    <div className="input-group">
+                      <label>Note</label>
+                      <div className="stars selectable">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <span
+                            key={star}
+                            className={star <= reviewData.rating ? "star filled" : "star"}
+                            onClick={() => setReviewData({ ...reviewData, rating: star })}
+                          >
+                            ★
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    
                     <button type="submit" className="submit-action-btn">
                       Envoyer
                     </button>

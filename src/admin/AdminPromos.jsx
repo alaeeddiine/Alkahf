@@ -45,13 +45,18 @@ const AdminPromos = () => {
     setShowModal(true);
   };
 
+  const formattedPromo = {
+    ...promoData,
+    amount: Number(promoData.amount) 
+  };
+
   const handleSubmit = async e => {
     e.preventDefault();
     try {
       if (editingId) {
-        await updateDoc(doc(db, "promos", editingId), promoData);
+        await updateDoc(doc(db, "promos", editingId), formattedPromo);
       } else {
-        await addDoc(promosCollection, { ...promoData, createdAt: serverTimestamp() });
+        await addDoc(promosCollection, { ...formattedPromo, createdAt: serverTimestamp() });
       }
       setShowModal(false);
       loadPromos();
@@ -103,7 +108,7 @@ const AdminPromos = () => {
               <div className="coupon-left">
                 {promo.type !== "announce" && (
                   <div className="promo-value">
-                    {promo.amount}<span>{promo.amount.includes('%') ? '' : '€'}</span>
+                    {promo.amount}<span>%</span>
                   </div>
                 )}
                 <div className="promo-type-tag">
@@ -193,7 +198,16 @@ const AdminPromos = () => {
                 <>
                   <div className="input-group">
                     <label><FaPercent /> Valeur de réduction</label>
-                    <input type="text" name="amount" value={promoData.amount} onChange={handleChange} required placeholder="Ex: 20% ou 50" />
+                    <input
+                      type="number"
+                      name="amount"
+                      value={promoData.amount}
+                      onChange={handleChange}
+                      required
+                      min="1"
+                      max="100"
+                      placeholder="Ex: 20"
+                    />
                   </div>
 
                   <div className="form-row-split">

@@ -739,6 +739,7 @@ h2 { font-size: 2rem; text-align: center; margin-bottom: 1rem; text-transform: u
   color: var(--rev-gold);
 }
 
+
 /* =========================================
    REVIEW POPUP – SAME DESIGN AS REVIEWS
    ========================================= */
@@ -760,7 +761,8 @@ h2 { font-size: 2rem; text-align: center; margin-bottom: 1rem; text-transform: u
   width: 100%;
   max-width: 520px;
   padding: 45px 40px;
-  border: 1px solid rgba(199, 160, 73, 0.25);
+  border-top: 1px solid #f0f0f0;
+  border-bottom: 1px solid #f0f0f0;
   box-shadow: var(--rev-shadow);
   position: relative;
 
@@ -914,6 +916,30 @@ h2 { font-size: 2rem; text-align: center; margin-bottom: 1rem; text-transform: u
     right: 12px;
   }
 }
+.stars {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.star {
+  font-size: 20px;
+  color: #ccc;
+}
+
+.star.filled {
+  color: #f5a623;
+}
+
+.stars.selectable .star {
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.stars.selectable .star:hover {
+  transform: scale(1.2);
+}
+
 
 
 /* =========================================
@@ -1125,7 +1151,7 @@ h2 { font-size: 2rem; text-align: center; margin-bottom: 1rem; text-transform: u
 }
 
 .filter-drawer.open {
-  max-height: 200px;
+  max-height: 350px;
   padding: 2rem;
   border-bottom: 1px solid var(--beige-dark);
 }
@@ -1197,13 +1223,14 @@ h2 { font-size: 2rem; text-align: center; margin-bottom: 1rem; text-transform: u
 
 .overlay-btn {
   background: var(--white);
-  border: none;
+  border-top: 1px solid #f0f0f0;
+  border-bottom: 1px solid #f0f0f0;
   width: 40px;
   height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
+  border-radius: 0%;
   cursor: pointer;
   transition: var(--transition);
 }
@@ -1741,6 +1768,38 @@ h2 { font-size: 2rem; text-align: center; margin-bottom: 1rem; text-transform: u
   padding: 20px 30px;
   box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1),
               0 10px 10px -5px rgba(0,0,0,0.04);
+}
+/* ===============================
+   🔒 Politique de retour (Modal)
+================================ */
+
+.return-policy {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 24px;
+  padding: 14px 16px;
+  background: #f9fafb;
+  border-radius: 10px;
+  border: 1px solid #ececec;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.return-policy .return-icon {
+  font-size: 1.4rem;
+  line-height: 1;
+  opacity: 0.8;
+}
+
+.return-policy p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.return-policy strong {
+  font-weight: 600;
+  color: #333;
 }
 
 /* --- VARIABLES & GLOBAL THEME --- */

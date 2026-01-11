@@ -3,7 +3,7 @@ import { useSearchParams, useLocation } from 'react-router-dom';
 import { getAllBooks, getBooksByCategory } from "../firebase/config";
 import { CartContext } from "../context/CartContext";
 import { 
-  FaShoppingCart, FaSearch, FaStar, FaSpinner, FaTimes,
+  FaShoppingCart, FaSearch, FaSpinner, FaTimes,
   FaFilter, FaSortAmountDown, FaEye, 
 } from 'react-icons/fa';
 import { db } from "../firebase/config";
@@ -36,7 +36,9 @@ const Books = () => {
     { value: "Quran & Tafsir", label: "Coran & Tafsir" },
     { value: "Sciences du Hadith", label: "Hadith" },
     { value: "Fiqh & Jurisprudence", label: "Jurisprudence" },
-    { value: "Sira & Biographies", label: "Biographies" }
+    { value: "Sira & Biographies", label: "Biographies" },
+    { value: "Tawhid ", label: "Tawhid" },
+    { value: "Aqida & Croyances", label: "Aqida & Croyances" }
   ];
 
   const sortOptions = [
@@ -126,6 +128,13 @@ const Books = () => {
 
   useEffect(() => setCurrentPage(1), [searchTerm, selectedCategory, sortBy]);
 
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  }, [currentPage]);
+
   const indexOfLastBook = currentPage * BOOKS_PER_PAGE;
   const indexOfFirstBook = indexOfLastBook - BOOKS_PER_PAGE;
   const currentBooks = filteredBooks.slice(indexOfFirstBook, indexOfLastBook);
@@ -133,14 +142,6 @@ const Books = () => {
 
   const openDetails = (book) => { setSelectedBook(book); setActiveImgIdx(0); document.body.style.overflow = 'hidden'; };
   const closeDetails = () => { setSelectedBook(null); document.body.style.overflow = 'auto'; };
-
-  const renderStars = (rating = 5) => (
-    <div className="rating-stars">
-      {[...Array(5)].map((_, i) => (
-        <FaStar key={i} className={i < Math.floor(rating) ? "star-filled" : "star-empty"} />
-      ))}
-    </div>
-  );
 
   return (
     <div className="books-page">
@@ -200,7 +201,6 @@ const Books = () => {
                       <span className="book-category-tag">{book.category}</span>
                       <h3 className="book-title">{book.title}</h3>
                       <p className="book-author">{book.author}</p>
-                      {renderStars(book.rating)}
                       <div className="book-card-footer">
                         {book.stock === 0 ? (
                           <>
@@ -262,6 +262,7 @@ const Books = () => {
                 <span className="overline">{selectedBook.category}</span>
                 <h2 className="details-title">{selectedBook.title}</h2>
                 <p className="details-author">Par <strong>{selectedBook.author}</strong></p>
+                <p className="details-edition">Edition: <strong>{selectedBook.edition}</strong></p>
                 <div className="details-price">
                   {selectedBook.promoPrice && selectedBook.promoPrice < selectedBook.price ? (
                     <>
@@ -279,10 +280,27 @@ const Books = () => {
                   </div>
                 </div>
                 <div className="details-actions">
-                  <button className={`add-btn buy-btn-large ${selectedBook.stock === 0 ? "disabled" : ""}`} disabled={selectedBook.stock === 0} onClick={() => { if(selectedBook.stock > 0) { addToCart(selectedBook); closeDetails(); } }}>
-                    Ajouter au panier <FaShoppingCart style={{marginLeft:'10px'}}/>
+                  <button
+                    className={`add-btn buy-btn-large ${selectedBook.stock === 0 ? "disabled" : ""}`}
+                    disabled={selectedBook.stock === 0}
+                    onClick={() => {
+                      if (selectedBook.stock > 0) {
+                        addToCart(selectedBook);
+                        closeDetails();
+                      }
+                    }}
+                  >
+                    Ajouter au panier <FaShoppingCart style={{ marginLeft: '10px' }} />
                   </button>
-                  {selectedBook.stock === 0 && <p className="stock-warning">Stock épuisé</p>}
+                </div><br />
+
+                {/* ⬇️ AJOUT ICI */}
+                <div className="return-policy">
+                  <span className="return-icon">📦</span>
+                  <p>
+                    <strong>Politique retours</strong> Vous disposez de 14 jours pour retourner
+                    votre colis après sa réception.
+                  </p>
                 </div>
               </div>
             </div>
