@@ -107,9 +107,13 @@ const Books = () => {
     let result = [...books];
 
     if (searchTerm.trim()) {
-      result = result.filter(b => 
-        b.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-        b.author.toLowerCase().includes(searchTerm.toLowerCase())
+      const term = searchTerm.toLowerCase();
+
+      result = result.filter(b =>
+        b.title?.toLowerCase().includes(term) ||
+        b.author?.toLowerCase().includes(term) ||
+        b.category?.toLowerCase().includes(term) ||
+        b.edition?.toLowerCase().includes(term)
       );
     }
 
