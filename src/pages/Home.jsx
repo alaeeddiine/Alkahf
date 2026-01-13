@@ -44,12 +44,6 @@ const Home = () => {
     message: "",
   });
 
-  // ---------- iOS Detection ----------
-  useEffect(() => {
-    const ua = window.navigator.userAgent.toLowerCase();
-    setIsIOS(/iphone|ipad|ipod/.test(ua));
-  }, []);
-
   // ---------- Newsletter ----------
   const handleNewsletterSubmit = async (e) => {
     e.preventDefault();
@@ -122,6 +116,15 @@ const Home = () => {
     })();
   }, []);
 
+  // video forcer 
+  useEffect(() => {
+    const video = document.querySelector(".hero-video");
+    if (video) {
+      video.muted = true;
+      video.play().catch(() => {});
+    }
+  }, []);
+
   // ---------- Fetch Pack ----------
   useEffect(() => {
     (async () => {
@@ -153,9 +156,9 @@ const Home = () => {
             muted
             loop
             playsInline
-            preload="metadata"
-            onCanPlayThrough={() => setVideoReady(true)}
-          >
+            preload="auto"
+            poster="/poster.jpg"
+            onLoadedData={() => setVideoReady(true)}>
             <source src={heroVideo} type="video/mp4" />
           </video>
         )}

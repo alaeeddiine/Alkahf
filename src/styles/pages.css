@@ -126,6 +126,8 @@ h2 { font-size: 2rem; text-align: center; margin-bottom: 1rem; text-transform: u
   position: relative;
   overflow: hidden;
   text-align: center;
+  position: relative;
+  overflow: hidden;
 }
 
 /* VIDEO = background */
@@ -139,6 +141,9 @@ h2 { font-size: 2rem; text-align: center; margin-bottom: 1rem; text-transform: u
   opacity: 50%;
   filter: blur(5px);
   transform: scale(1.05); /* évite les bords visibles à cause du blur */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 /* OVERLAY (inchangé) */
@@ -152,6 +157,9 @@ h2 { font-size: 2rem; text-align: center; margin-bottom: 1rem; text-transform: u
   );
   opacity: 0.5;
   z-index: 1;
+  content: "";
+  position: absolute;
+  inset: 0;
 }
 
 /* CONTENU AU-DESSUS */
