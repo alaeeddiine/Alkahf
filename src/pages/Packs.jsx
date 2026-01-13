@@ -157,9 +157,6 @@ const PacksClient = () => {
               </div>
 
               <div className="card-info">
-                <div className="rating-mini">
-                  <FaStar /><FaStar /><FaStar /><FaStar /><FaStar />
-                </div>
                 <h3>{pack.title}</h3>
 
                 {pack.includedBooks?.length > 0 && (
@@ -332,7 +329,7 @@ const PacksClient = () => {
                   </button>
 
                   <p className="shipping-note">
-                    Livraison sécurisée sous 48h — Frais offerts dès 100€ d'achat
+                    Expédition sous 24h - Frais offerts dés 100€ d'achat
                   </p>
                 </div>
               </div>
