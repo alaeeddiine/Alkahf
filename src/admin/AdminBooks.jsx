@@ -41,6 +41,7 @@ const AdminBooks = () => {
 
   const [form, setForm] = useState({
     title: "",
+    edition: "",
     author: "",
     description: "",
     price: "",
@@ -123,6 +124,7 @@ const AdminBooks = () => {
       setEditId(null);
       setForm({
         title: "",
+        edition: "",
         author: "",
         description: "",
         price: "",
@@ -151,6 +153,7 @@ const AdminBooks = () => {
     setEditId(book.id);
     setForm({
       title: book.title || "",
+      edition: book.edition || "",
       author: book.author || "",
       description: book.description || "",
       price: book.price || "",
