@@ -237,7 +237,7 @@
   --sidebar-bg: #1a1a1a;
 }
 
-.manager-dashboard {
+.manager-dashboard {  
   display: flex;
   min-height: 100vh;
   background-color: #f8f9fa;

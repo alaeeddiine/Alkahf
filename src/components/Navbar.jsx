@@ -100,7 +100,7 @@ const Navbar = ({ onCartClick }) => {
     return (
       <>
         <strong>{promo.title}</strong>
-        {promo.amount && ` -${promo.amount}`}
+        {promo.amount && ` -${promo.amount}%`}
         {` sur ${formatTarget(promo.appliesTo)}`}
         {daysLeft !== null && ` | ⏳ Plus que ${daysLeft} jour${daysLeft > 1 ? "s" : ""}`}
       </>

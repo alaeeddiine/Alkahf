@@ -49,7 +49,7 @@ const AdminPromos = () => {
     ...promoData,
     amount: Number(promoData.amount) 
   };
-
+  
   const handleSubmit = async e => {
     e.preventDefault();
     try {

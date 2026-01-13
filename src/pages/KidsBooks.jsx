@@ -9,9 +9,20 @@ import {
 import logo from "../assets/kids.png";
 import headerBg from "../assets/kids-banner.png";
 
+/* 🔥 FIRESTORE PROMOS */
+import { db } from "../firebase/config";
+import { collection, getDocs, query, where } from "firebase/firestore";
+
+/* ---------- TAX ---------- */
 const TAX_RATE = 21;
 const getPriceWithTax = (price) =>
   +(price * (1 + TAX_RATE / 100)).toFixed(2);
+
+/* ---------- PROMO UTILS (IDENTIQUE HOME / BOOKS) ---------- */
+const applyPromo = (price, promo) => {
+  if (!promo || promo.amount == null) return price;
+  return +(price * (1 - promo.amount / 100)).toFixed(2);
+};
 
 const KidsBooks = () => {
   const [books, setBooks] = useState([]);
@@ -35,11 +46,36 @@ const KidsBooks = () => {
     { value: "title", label: "Ordre alphabétique" }
   ];
 
-  // 🔹 Charger les livres enfants
+  /* ---------- PROMOS ---------- */
+  const getGeneralPromos = async () => {
+    const q = query(
+      collection(db, "promos"),
+      where("active", "==", true),
+      where("type", "==", "general")
+    );
+    const snap = await getDocs(q);
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  };
+
+  /* ---------- LOAD KIDS BOOKS ---------- */
   useEffect(() => {
     const loadKidsBooks = async () => {
       setLoading(true);
-      const data = await getBooksByCategory("Livres enfants");
+
+      let data = await getBooksByCategory("Livres enfants");
+
+      const promos = await getGeneralPromos();
+      const promo = promos.find(
+        p => p.appliesTo === "all" || p.appliesTo === "books"
+      );
+
+      if (promo) {
+        data = data.map(book => ({
+          ...book,
+          promoPrice: applyPromo(book.price, promo)
+        }));
+      }
+
       setBooks(data);
       setFilteredBooks(data);
       setLoading(false);
@@ -53,10 +89,11 @@ const KidsBooks = () => {
         }
       }
     };
+
     loadKidsBooks();
   }, [location.state]);
 
-  // 🔹 Filtrage & tri
+  /* ---------- FILTER & SORT ---------- */
   useEffect(() => {
     let result = [...books];
 
@@ -74,13 +111,10 @@ const KidsBooks = () => {
     setFilteredBooks(result);
     setCurrentPage(1);
   }, [searchTerm, sortBy, books]);
-  
+
   useEffect(() => {
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-      });
-    }, [currentPage]);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [currentPage]);
 
   const indexOfLastBook = currentPage * BOOKS_PER_PAGE;
   const indexOfFirstBook = indexOfLastBook - BOOKS_PER_PAGE;
@@ -111,7 +145,7 @@ const KidsBooks = () => {
 
   return (
     <div className="books-page">
-      {/* 🎨 Nouveau Header avec Image Floue */}
+      {/* HERO */}
       <div className="kids-hero-banner">
         <div className="hero-bg-container" style={{ backgroundImage: `url(${headerBg})` }}></div>
         <div className="hero-content">
@@ -119,7 +153,7 @@ const KidsBooks = () => {
         </div>
       </div>
 
-      {/* 🔎 Search & Sort */}
+      {/* SEARCH & SORT */}
       <div className="books-tools container-inner">
         <div className="search-wrapper">
           <FaSearch className="search-icon" />
@@ -130,10 +164,7 @@ const KidsBooks = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
           {searchTerm && (
-            <FaTimes
-              className="clear-search"
-              onClick={() => setSearchTerm('')}
-            />
+            <FaTimes className="clear-search" onClick={() => setSearchTerm('')} />
           )}
         </div>
 
@@ -141,16 +172,15 @@ const KidsBooks = () => {
           <FaSortAmountDown className="sort-icon" />
           <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
             {sortOptions.map(opt => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
             ))}
           </select>
         </div>
       </div>
+
       <br />
 
-      {/* 📚 Books Grid */}
+      {/* BOOKS GRID */}
       <div className="container-inner">
         {loading ? (
           <div className="loading-state">
@@ -159,33 +189,20 @@ const KidsBooks = () => {
           </div>
         ) : (
           <>
-            <p className="results-text">
-              {filteredBooks.length} ouvrages trouvés
-            </p>
+            <p className="results-text">{filteredBooks.length} ouvrages trouvés</p>
 
             <div className="books-grid">
               {currentBooks.map(book => (
-                <div
-                  className="book-card"
-                  key={book.id}
-                  onClick={() => openDetails(book)}
-                >
+                <div className="book-card" key={book.id} onClick={() => openDetails(book)}>
                   <div className="book-image-container">
-                    <img
-                      src={book.images?.[0] || book.image || "/placeholder.jpg"}
-                      alt={book.title}
-                    />
+                    <img src={book.images?.[0] || book.image || "/placeholder.jpg"} alt={book.title} />
                     <div className="card-overlay">
-                      <button className="overlay-btn">
-                        <FaEye />
-                      </button>
+                      <button className="overlay-btn"><FaEye /></button>
                     </div>
                   </div>
 
                   <div className="book-info">
-                    <span className="book-category-tag">
-                      {book.category}
-                    </span>
+                    <span className="book-category-tag">{book.category}</span>
                     <h3 className="book-title">{book.title}</h3>
                     <p className="book-author">{book.author}</p>
                     {renderStars(book.rating)}
@@ -193,29 +210,20 @@ const KidsBooks = () => {
                     <div className="book-card-footer">
                       {book.stock === 0 ? (
                         <>
-                          <span className="current-price">
-                            {getPriceWithTax(book.price)} € TTC
-                          </span>
-                          <button className="add-cart-mini disabled" disabled>
-                            <FaShoppingCart />
-                          </button>
+                          <span className="current-price">{getPriceWithTax(book.price)} € TTC</span>
+                          <button className="add-cart-mini disabled" disabled><FaShoppingCart /></button>
                           <p className="stock-warning">Stock épuisé</p>
                         </>
                       ) : (
                         <>
                           {book.promoPrice && book.promoPrice < book.price ? (
                             <span className="current-price">
-                              <s>{getPriceWithTax(book.price)} €</s>{' '}
-                              <strong>
-                                {getPriceWithTax(book.promoPrice)} €
-                              </strong>
+                              <s>{getPriceWithTax(book.price)} €</s>{" "}
+                              <strong>{getPriceWithTax(book.promoPrice)} €</strong>
                             </span>
                           ) : (
-                            <span className="current-price">
-                              {getPriceWithTax(book.price)} €
-                            </span>
+                            <span className="current-price">{getPriceWithTax(book.price)} €</span>
                           )}
-
                           <button
                             className="add-cart-mini"
                             onClick={(e) => {
@@ -233,35 +241,29 @@ const KidsBooks = () => {
               ))}
             </div>
 
-            {/* Pagination */}
             {totalPages > 1 && (
-                <div className="pagination">
-                  <button className="page-btn" disabled={currentPage === 1} onClick={() => setCurrentPage(prev => prev - 1)}>Précédent</button>
-                  {[...Array(totalPages)].map((_, idx) => (
-                    <button key={idx} className={`page-btn ${currentPage === idx + 1 ? 'active' : ''}`} onClick={() => setCurrentPage(idx + 1)}>{idx + 1}</button>
-                  ))}
-                  <button className="page-btn" disabled={currentPage === totalPages} onClick={() => setCurrentPage(prev => prev + 1)}>Suivant</button>
-                </div>
-              )}
+              <div className="pagination">
+                <button className="page-btn" disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)}>Précédent</button>
+                {[...Array(totalPages)].map((_, i) => (
+                  <button key={i} className={`page-btn ${currentPage === i + 1 ? "active" : ""}`} onClick={() => setCurrentPage(i + 1)}>{i + 1}</button>
+                ))}
+                <button className="page-btn" disabled={currentPage === totalPages} onClick={() => setCurrentPage(p => p + 1)}>Suivant</button>
+              </div>
+            )}
           </>
         )}
       </div>
 
-      {/* 🧾 Modal Détails */}
+      {/* MODAL DETAILS */}
       {selectedBook && (
         <div className="details-overlay" onClick={closeDetails}>
           <div className="details-modal" onClick={e => e.stopPropagation()}>
-            <button className="close-details" onClick={closeDetails}>
-              <FaTimes />
-            </button>
+            <button className="close-details" onClick={closeDetails}><FaTimes /></button>
 
             <div className="details-grid">
               <div className="details-gallery">
                 <div className="main-image-container book-main-img">
-                  <img
-                    src={selectedBook.images?.[activeImgIdx] || selectedBook.image}
-                    alt="Preview"
-                  />
+                  <img src={selectedBook.images?.[activeImgIdx] || selectedBook.image} alt="Preview" />
                 </div>
 
                 <div className="thumbnails-row">
@@ -269,9 +271,9 @@ const KidsBooks = () => {
                     <img
                       key={idx}
                       src={img}
-                      alt="thumb"
                       className={activeImgIdx === idx ? "active-thumb" : ""}
                       onClick={() => setActiveImgIdx(idx)}
+                      alt="thumb"
                     />
                   ))}
                 </div>
@@ -280,18 +282,18 @@ const KidsBooks = () => {
               <div className="details-info">
                 <span className="overline">{selectedBook.category}</span>
                 <h2 className="details-title">{selectedBook.title}</h2>
-                <p className="details-author">
-                  Par <strong>{selectedBook.author}</strong>
-                </p>
+                <p className="details-author">Par <strong>{selectedBook.author}</strong></p>
+                <p className="details-author">Edition <strong>{selectedBook.edition}</strong></p>
+                
 
                 <div className="details-price">
                   {selectedBook.promoPrice && selectedBook.promoPrice < selectedBook.price ? (
                     <>
-                      <s>{getPriceWithTax(selectedBook.price)} € TTC</s>{' '}
+                      <s>{getPriceWithTax(selectedBook.price)} €</s>{" "}
                       <strong>{getPriceWithTax(selectedBook.promoPrice)} €</strong>
                     </>
                   ) : (
-                    <>{getPriceWithTax(selectedBook.price)} €</>
+                    <>{getPriceWithTax(selectedBook.price)} € TTC</>
                   )}
                 </div>
 
@@ -315,12 +317,12 @@ const KidsBooks = () => {
                     Ajouter au panier <FaShoppingCart style={{ marginLeft: 10 }} />
                   </button>
                 </div>
-                {/* 🔒 Politique de retour */}
+
                 <div className="return-policy">
                   <span className="return-icon">📦</span>
                   <p>
                     <strong>Politique retours</strong> Vous disposez de 14 jours pour retourner
-                    votre colis après sa réception.
+                    votre Articles après sa réception.
                   </p>
                 </div>
               </div>

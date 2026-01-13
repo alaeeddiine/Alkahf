@@ -68,21 +68,20 @@ const Books = () => {
       data = data.filter(book => book.category !== "Livres enfants");
 
       const generalPromos = await getGeneralPromos();
-      const applicablePromo = generalPromos.find(p => p.appliesTo === 'all' || p.appliesTo === 'books');
+      const applyPromo = (price, promo) => {
+        if (!promo || promo.amount == null) return price;
+        return +(price * (1 - promo.amount / 100)).toFixed(2);
+      };
+
+      const applicablePromo = generalPromos.find(
+        p => p.appliesTo === "all" || p.appliesTo === "books"
+      );
 
       if (applicablePromo) {
-        data = data.map(book => {
-          const basePrice = book.price;
-          let promoPrice;
-          if (applicablePromo.amount.includes('%')) {
-            const percent = parseFloat(applicablePromo.amount.replace('%', ''));
-            promoPrice = +(basePrice * (1 - percent / 100)).toFixed(2);
-          } else {
-            promoPrice = +(basePrice - parseFloat(applicablePromo.amount)).toFixed(2);
-          }
-          promoPrice = promoPrice < 0 ? 0 : promoPrice;
-          return { ...book, promoPrice };
-        });
+        data = data.map(book => ({
+          ...book,
+          promoPrice: applyPromo(book.price, applicablePromo)
+        }));
       }
 
       setBooks(data);
@@ -200,7 +199,7 @@ const Books = () => {
                     <div className="book-info">
                       <span className="book-category-tag">{book.category}</span>
                       <h3 className="book-title">{book.title}</h3>
-                      <p className="book-author">{book.author}</p>
+                      <p className="book-author">{book.edition}</p>
                       <div className="book-card-footer">
                         {book.stock === 0 ? (
                           <>
@@ -266,10 +265,10 @@ const Books = () => {
                 <div className="details-price">
                   {selectedBook.promoPrice && selectedBook.promoPrice < selectedBook.price ? (
                     <>
-                      <s>{getPriceWithTax(selectedBook.price)} € TTC</s> <strong>{getPriceWithTax(selectedBook.promoPrice)} €</strong>
+                      <s>{getPriceWithTax(selectedBook.price)} €</s> <strong>{getPriceWithTax(selectedBook.promoPrice)} €</strong>
                     </>
                   ) : (
-                    <>{getPriceWithTax(selectedBook.price)} €</> 
+                    <>{getPriceWithTax(selectedBook.price)} € TTC</> 
                   )}
                 </div>
                 <div className="details-scroll-area">
@@ -299,7 +298,7 @@ const Books = () => {
                   <span className="return-icon">📦</span>
                   <p>
                     <strong>Politique retours</strong> Vous disposez de 14 jours pour retourner
-                    votre colis après sa réception.
+                    votre Articles après sa réception.
                   </p>
                 </div>
               </div>

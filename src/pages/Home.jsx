@@ -84,12 +84,12 @@ const Home = () => {
 
   // ---------- Promo utils ----------
   const applyPromo = (price, promo) => {
-    if (!promo) return price;
-    if (promo.amount.includes("%")) {
-      return +(price * (1 - parseFloat(promo.amount) / 100)).toFixed(2);
-    }
-    return Math.max(0, +(price - parseFloat(promo.amount)).toFixed(2));
+    if (!promo || promo.amount == null) return price;
+
+    // On considère que promo.amount est un pourcentage
+    return +(price * (1 - promo.amount / 100)).toFixed(2);
   };
+
 
   const getGeneralPromos = async () => {
     const q = query(
@@ -201,15 +201,17 @@ const Home = () => {
                   <div className="book-info">
                     <div className="meta"><span>{book.category}</span></div>
                     <h3>{book.title}</h3>
-                    <p className="author">de {book.author}</p>
+                    <p className="author">Edition {book.edition}</p>
                     <div className="book-footer">
                       <span className="price">
                         {book.promoPrice && book.promoPrice < book.price ? (
                           <>
-                            <s>{formatPrice(book.price)}</s>{" "}
-                            <strong>{formatPrice(book.promoPrice)}</strong>
+                            <s>{formatPrice(getPriceWithTax(book.price))}</s>{" "}
+                            <strong>{formatPrice(getPriceWithTax(book.promoPrice))}</strong>
                           </>
-                        ) : formatPrice(book.price)}
+                        ) : (
+                          formatPrice(getPriceWithTax(book.price))
+                        )}
                       </span>
                     </div>
                     <Link

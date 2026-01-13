@@ -105,8 +105,10 @@ const AdminBooks = () => {
     try {
       const payload = {
         ...form,
-        price: Number(form.price),
-        promoPrice: form.promoPrice ? Number(form.promoPrice) : null,
+        price: Number(Number(form.price).toFixed(2)),
+        promoPrice: form.promoPrice
+          ? Number(Number(form.promoPrice).toFixed(2))
+          : null,
         stock: Number(form.stock),
         updatedAt: Timestamp.now(),
       };
@@ -221,10 +223,11 @@ const AdminBooks = () => {
                 <td className="price-tag">
                   {book.promoPrice ? (
                     <>
-                      <s>{book.price}€</s> <b>{book.promoPrice}€</b>
+                      <s>{book.price.toFixed(2)}€</s>{" "}
+                      <b>{book.promoPrice.toFixed(2)}€</b>
                     </>
                   ) : (
-                    `${book.price}€`
+                    `${book.price.toFixed(2)}€`
                   )}
                 </td>
                 <td>{book.stock}</td>
@@ -296,6 +299,7 @@ const AdminBooks = () => {
                   <label>Prix</label>
                   <input
                     type="number"
+                    step="0.01"
                     required
                     value={form.price}
                     onChange={(e) => setForm({ ...form, price: e.target.value })}
@@ -305,12 +309,12 @@ const AdminBooks = () => {
                   <label>Prix promo (optionnel)</label>
                   <input
                     type="number"
+                    step="0.01"
                     value={form.promoPrice}
                     onChange={(e) => setForm({ ...form, promoPrice: e.target.value })}
                   />
                 </div>
               </div>
-
               <div className="input-group">
                 <label>Stock</label>
                 <input

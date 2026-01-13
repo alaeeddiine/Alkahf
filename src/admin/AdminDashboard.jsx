@@ -223,7 +223,9 @@ const AdminDashboard = () => {
                   <strong>{b.title}</strong>
                   <p>{b.author}</p>
                 </div>
-                <div className="asset-price">{b.price} €</div>
+                <div className="asset-price">
+                  {Number(b.price).toFixed(2)} €
+                </div>
               </div>
             ))}
           </div>
