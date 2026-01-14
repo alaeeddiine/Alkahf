@@ -116,14 +116,11 @@ const Home = () => {
     })();
   }, []);
 
-  // video forcer 
   useEffect(() => {
-    const video = document.querySelector(".hero-video");
-    if (video) {
-      video.muted = true;
-      video.play().catch(() => {});
-    }
+    const ua = window.navigator.userAgent.toLowerCase();
+    setIsIOS(/iphone|ipad|ipod/.test(ua));
   }, []);
+
 
   // ---------- Fetch Pack ----------
   useEffect(() => {
@@ -156,9 +153,11 @@ const Home = () => {
             muted
             loop
             playsInline
-            preload="auto"
+            webkit-playsinline="true"
+            preload="metadata"
             poster="/poster.jpg"
-            onLoadedData={() => setVideoReady(true)}>
+            onCanPlay={() => setVideoReady(true)}
+          >
             <source src={heroVideo} type="video/mp4" />
           </video>
         )}
