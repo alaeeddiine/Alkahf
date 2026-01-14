@@ -142,6 +142,11 @@ const Books = () => {
   const indexOfFirstBook = indexOfLastBook - BOOKS_PER_PAGE;
   const currentBooks = filteredBooks.slice(indexOfFirstBook, indexOfLastBook);
   const totalPages = Math.ceil(filteredBooks.length / BOOKS_PER_PAGE);
+  const PAGES_PER_GROUP = 6;
+  const currentGroup = Math.floor((currentPage - 1) / PAGES_PER_GROUP);
+  const startPage = currentGroup * PAGES_PER_GROUP + 1;
+  const endPage = Math.min(startPage + PAGES_PER_GROUP - 1, totalPages);
+
 
   const openDetails = (book) => { setSelectedBook(book); setActiveImgIdx(0); document.body.style.overflow = 'hidden'; };
   const closeDetails = () => { setSelectedBook(null); document.body.style.overflow = 'auto'; };
@@ -233,13 +238,42 @@ const Books = () => {
 
               {totalPages > 1 && (
                 <div className="pagination">
-                  <button className="page-btn" disabled={currentPage === 1} onClick={() => setCurrentPage(prev => prev - 1)}>Précédent</button>
-                  {[...Array(totalPages)].map((_, idx) => (
-                    <button key={idx} className={`page-btn ${currentPage === idx + 1 ? 'active' : ''}`} onClick={() => setCurrentPage(idx + 1)}>{idx + 1}</button>
-                  ))}
-                  <button className="page-btn" disabled={currentPage === totalPages} onClick={() => setCurrentPage(prev => prev + 1)}>Suivant</button>
+
+                  {/* Précédent groupe */}
+                  <button
+                    className="page-btn"
+                    disabled={currentGroup === 0}
+                    onClick={() => setCurrentPage(startPage - 1)}
+                  >
+                    Précédent
+                  </button>
+
+                  {/* Pages visibles */}
+                  {Array.from({ length: endPage - startPage + 1 }, (_, i) => {
+                    const page = startPage + i;
+                    return (
+                      <button
+                        key={page}
+                        className={`page-btn ${currentPage === page ? "active" : ""}`}
+                        onClick={() => setCurrentPage(page)}
+                      >
+                        {page}
+                      </button>
+                    );
+                  })}
+
+                  {/* Suivant groupe */}
+                  <button
+                    className="page-btn"
+                    disabled={endPage >= totalPages}
+                    onClick={() => setCurrentPage(endPage + 1)}
+                  >
+                    Suivant
+                  </button>
+
                 </div>
               )}
+
             </>
           )}
         </div>

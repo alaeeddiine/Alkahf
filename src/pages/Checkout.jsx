@@ -194,13 +194,14 @@ const Checkout = () => {
               <PayPalButtons
                 style={{ layout: "vertical", color: "gold", shape: "rect", label: "paypal" }}
                 createOrder={(data, actions) => actions.order.create({
-                  purchase_units: [{ amount: { value: totals.grandTotal.toFixed(2) } }],
+                  purchase_units: [{ amount: {currency_code: "EUR",value: totals.grandTotal.toFixed(2)} }]
                 })}
                 onApprove={async (data, actions) => {
                   const details = await actions.order.capture();
                   handlePaymentSuccess(details);
                 }}
-                onError={(err) => { console.error(err); alert("Erreur lors du paiement !"); }}
+                onCancel={() => {alert("Paiement annulé.");}}
+                onError={(err) => {console.error("PayPal error:", err); alert("Le paiement a échoué. Vérifiez votre carte ou votre banque.");}}
               />
             )}
           </div>
