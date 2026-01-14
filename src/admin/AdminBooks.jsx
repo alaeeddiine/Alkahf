@@ -52,6 +52,23 @@ const AdminBooks = () => {
     images: [""],
   });
 
+  // pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const BOOKS_PER_PAGE = 10; // ajustable
+  const PAGES_PER_GROUP = 6;
+
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }, [currentPage]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
+
   const booksCollection = collection(db, "books");
 
   /* ================= AUTH & FETCH ================= */
@@ -60,6 +77,11 @@ const AdminBooks = () => {
     getBooks();
     return () => unsub();
   }, []);
+
+  // pagination 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
 
   const getBooks = async () => {
     const data = await getDocs(booksCollection);
@@ -166,11 +188,34 @@ const AdminBooks = () => {
     setShowForm(true);
   };
 
-  const filteredBooks = books.filter(
-    (b) =>
-      b.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      b.author?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredBooks = (() => {
+  let result = [...books];
+
+    if (searchTerm.trim()) {
+      const term = searchTerm.toLowerCase();
+
+      result = result.filter(b =>
+        b.title?.toLowerCase().includes(term) ||
+        b.author?.toLowerCase().includes(term) ||
+        b.category?.toLowerCase().includes(term) ||
+        b.edition?.toLowerCase().includes(term)
+      );
+    }
+
+    return result;
+  })();
+
+  const indexOfLastBook = currentPage * BOOKS_PER_PAGE;
+  const indexOfFirstBook = indexOfLastBook - BOOKS_PER_PAGE;
+  const currentBooks = filteredBooks.slice(indexOfFirstBook, indexOfLastBook);
+
+  const totalPages = Math.ceil(filteredBooks.length / BOOKS_PER_PAGE);
+
+  const currentGroup = Math.floor((currentPage - 1) / PAGES_PER_GROUP);
+  const startPage = currentGroup * PAGES_PER_GROUP + 1;
+  const endPage = Math.min(startPage + PAGES_PER_GROUP - 1, totalPages);
+
+  
 
   return (
     <div className="admin-page-container">
@@ -209,7 +254,7 @@ const AdminBooks = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredBooks.map((book) => (
+            {currentBooks.map((book) => (
               <tr key={book.id}>
                 <td>
                   <div className="book-cell">
@@ -248,6 +293,44 @@ const AdminBooks = () => {
             ))}
           </tbody>
         </table>
+        {totalPages > 1 && (
+          <div className="pagination">
+
+            {/* Groupe précédent */}
+            <button
+              className="page-btn"
+              disabled={currentGroup === 0}
+              onClick={() => setCurrentPage(startPage - 1)}
+            >
+              Précédent
+            </button>
+
+            {/* Pages visibles */}
+            {Array.from({ length: endPage - startPage + 1 }, (_, i) => {
+              const page = startPage + i;
+              return (
+                <button
+                  key={page}
+                  className={`page-btn ${currentPage === page ? "active" : ""}`}
+                  onClick={() => setCurrentPage(page)}
+                >
+                  {page}
+                </button>
+              );
+            })}
+
+            {/* Groupe suivant */}
+            <button
+              className="page-btn"
+              disabled={endPage >= totalPages}
+              onClick={() => setCurrentPage(endPage + 1)}
+            >
+              Suivant
+            </button>
+
+          </div>
+        )}
+
       </div>
 
       {/* FORM POPUP */}
