@@ -171,9 +171,9 @@ const Home = () => {
 
         {/* ===== CAROUSEL MOBILE ===== */}
         <div className="hero-mobile-carousel">
-          <div className="carousel-track">
-            <img src={heroImg1} alt="Hero mobile 1" />
-            <img src={heroImg2} alt="Hero mobile 2" />
+          <div class="hero-mobile-carousel">
+            <div class="carousel-slide slide-1"></div>
+            <div class="carousel-slide slide-2"></div>
           </div>
         </div>
 
