@@ -116,11 +116,19 @@ const Home = () => {
     })();
   }, []);
 
+  
+  // ---------- Hero Video iOS Play Fix ----------
   useEffect(() => {
-    const ua = window.navigator.userAgent.toLowerCase();
-    setIsIOS(/iphone|ipad|ipod/.test(ua));
-  }, []);
+    const video = document.querySelector(".hero-video");
+    if (!video) return;
 
+    const tryPlay = () => {
+      video.play().catch(() => {});
+      window.removeEventListener("touchstart", tryPlay);
+    };
+
+    window.addEventListener("touchstart", tryPlay);
+  }, []);
 
   // ---------- Fetch Pack ----------
   useEffect(() => {
@@ -146,21 +154,18 @@ const Home = () => {
     <div className="home">
       {/* HERO */}
       <section className={`hero ${videoReady ? "video-loaded" : ""}`}>
-        {!isIOS && (
-          <video
-            className="hero-video"
-            autoPlay
-            muted
-            loop
-            playsInline
-            webkit-playsinline="true"
-            preload="metadata"
-            poster="/poster.jpg"
-            onCanPlay={() => setVideoReady(true)}
-          >
-            <source src={heroVideo} type="video/mp4" />
-          </video>
-        )}
+        <video
+          className="hero-video"
+          muted
+          loop
+          playsInline
+          autoPlay
+          preload="auto"
+          poster="/poster.jpg"
+          onLoadedData={() => setVideoReady(true)}
+        >
+          <source src={heroVideo} type="video/mp4" />
+        </video>
 
         <div className="hero-content">
           <h1>
