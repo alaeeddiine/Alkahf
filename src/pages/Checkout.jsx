@@ -24,7 +24,8 @@ const Checkout = () => {
     name: "", email: "", address: "", city: "", country: "", zipCode: "", promoCode: "",
   });
 
-  const [promoDiscount, setPromoDiscount] = useState(0);
+  const [promoPercent, setPromoPercent] = useState(0);
+  const [promoDiscountValue, setPromoDiscountValue] = useState(0);
   const [promoMessage, setPromoMessage] = useState({ text: "", type: "" });
   const [totals, setTotals] = useState({ subtotal: 0, shipping: 0, tax: 0, grandTotal: 0 });
   const [paymentSuccess, setPaymentSuccess] = useState(false);
@@ -39,46 +40,76 @@ const Checkout = () => {
   // 🔹 Calcul des totaux TTC
   useEffect(() => {
     const subtotal = cartItems.reduce(
-      (sum, item) => sum + priceWithTax(item.promoPrice ?? item.price ?? 0) * item.quantity,
+      (sum, item) =>
+        sum +
+        priceWithTax(item.promoPrice ?? item.price ?? 0) * item.quantity,
       0
     );
 
     const shipping = calculateShipping(subtotal);
-    const totalAfterDiscount = subtotal - promoDiscount;
-    const tax = totalAfterDiscount * (TAX_RATE / (100 + TAX_RATE)); // fraction de la TVA déjà incluse
+    const totalAfterDiscount = subtotal - promoDiscountValue;
+    const tax = totalAfterDiscount * (TAX_RATE / (100 + TAX_RATE));
 
     setTotals({
       subtotal,
       shipping,
       tax,
-      grandTotal: totalAfterDiscount + shipping
+      grandTotal: totalAfterDiscount + shipping,
     });
-  }, [cartItems, promoDiscount]);
+  }, [cartItems, promoDiscountValue]);
+
 
   const handleInputChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const handleApplyPromo = async () => {
     if (!formData.promoCode.trim()) return;
+
     try {
       const q = query(
         collection(db, "promos"),
         where("code", "==", formData.promoCode.trim()),
         where("active", "==", true)
       );
+
       const snap = await getDocs(q);
 
       if (snap.empty) {
-        setPromoDiscount(0);
+        setPromoPercent(0);
+        setPromoDiscountValue(0);
         setPromoMessage({ text: "Code invalide.", type: "error" });
-      } else {
-        const discount = Number(snap.docs[0].data().amount || 0);
-        setPromoDiscount(discount);
-        setPromoMessage({ text: `Réduction de ${discount}€ appliquée !`, type: "success" });
+        return;
       }
-    } catch {
+
+      const promo = snap.docs[0].data();
+      const percent = Number(promo.amount || 0);
+
+      if (percent <= 0 || percent > 100) {
+        setPromoMessage({ text: "Promotion invalide.", type: "error" });
+        return;
+      }
+
+      const subtotal = cartItems.reduce(
+        (sum, item) =>
+          sum +
+          priceWithTax(item.promoPrice ?? item.price ?? 0) * item.quantity,
+        0
+      );
+
+      const discountValue = +(subtotal * (percent / 100)).toFixed(2);
+
+      setPromoPercent(percent);
+      setPromoDiscountValue(discountValue);
+      setPromoMessage({
+        text: `Réduction de ${percent}% appliquée !`,
+        type: "success",
+      });
+
+    } catch (error) {
+      console.error(error);
       setPromoMessage({ text: "Erreur serveur.", type: "error" });
     }
   };
+
 
   const handlePaymentSuccess = async (details) => {
     try {
@@ -184,7 +215,12 @@ const Checkout = () => {
               <div className="calc-row"><span>Sous-total (TTC)</span><span>{totals.subtotal.toFixed(2)}€</span></div>
               <div className="calc-row"><span>Frais d'envoi</span><span>{totals.shipping === 0 ? "Offerts" : `${totals.shipping.toFixed(2)}€`}</span></div>
               {/* <div className="calc-row"><span>Taxe (21%) incluse</span><span>{totals.tax.toFixed(2)}€</span></div> */}
-              {promoDiscount > 0 && <div className="calc-row discount-row"><span>Réduction</span><span>-{promoDiscount.toFixed(2)}€</span></div>}
+              {promoDiscountValue > 0 && (
+                <div className="calc-row discount-row">
+                  <span>Réduction ({promoPercent}%)</span>
+                  <span>-{promoDiscountValue.toFixed(2)}€</span>
+                </div>
+              )}
               <div className="calc-row grand-total-row"><span>Total</span><span>{totals.grandTotal.toFixed(2)}€</span></div>
             </div>
 

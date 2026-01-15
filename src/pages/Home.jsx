@@ -21,6 +21,8 @@ import {
 } from "firebase/firestore";
 import { db } from "../firebase/config";
 import heroVideo from "../assets/hero.mp4";
+import heroImg1 from "../assets/mobile1.jpeg";
+import heroImg2 from "../assets/mobile2.jpeg";
 
 /* ---------- TAX UTILS (IDENTIQUE À PACKS) ---------- */
 const TAX_RATE = 21;
@@ -167,6 +169,15 @@ const Home = () => {
           <source src={heroVideo} type="video/mp4" />
         </video>
 
+        {/* ===== CAROUSEL MOBILE ===== */}
+        <div className="hero-mobile-carousel">
+          <div className="carousel-track">
+            <img src={heroImg1} alt="Hero mobile 1" />
+            <img src={heroImg2} alt="Hero mobile 2" />
+          </div>
+        </div>
+
+        {/* ===== CONTENU ===== */}
         <div className="hero-content">
           <h1>
             La caverne fut un Refuge <span className="highlight">pour les Croyants.</span>
