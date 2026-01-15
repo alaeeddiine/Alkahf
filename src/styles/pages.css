@@ -135,10 +135,10 @@ h2 { font-size: 2rem; text-align: center; margin-bottom: 1rem; text-transform: u
   width: 100%;
   height: 100%;
   object-fit: cover;
-  z-index: 0;
-  opacity: 50%;
+  z-index: 1;
+  opacity: 0.5;
   filter: blur(5px);
-  transform: scale(1.05); /* évite les bords visibles à cause du blur */
+  transform: scale(1.05);
 }
 /* ===============================
    HERO MOBILE CAROUSEL
@@ -147,12 +147,11 @@ h2 { font-size: 2rem; text-align: center; margin-bottom: 1rem; text-transform: u
 .hero-mobile-carousel {
   position: absolute;
   inset: 0;
-  z-index: 0;
+  z-index: 1;
   display: none;
   overflow: hidden;
 }
 
-/* Slides */
 .hero-mobile-carousel .carousel-slide {
   position: absolute;
   inset: 0;
@@ -162,7 +161,7 @@ h2 { font-size: 2rem; text-align: center; margin-bottom: 1rem; text-transform: u
   opacity: 0;
   transform: scale(1);
   animation: heroSlide 10s infinite;
-  zoom: 1;
+  will-change: opacity, transform;
 }
 
 /* Images */
@@ -179,13 +178,16 @@ h2 { font-size: 2rem; text-align: center; margin-bottom: 1rem; text-transform: u
 /* Mobile uniquement */
 @media (max-width: 768px) {
   .hero-video {
-    display: none;
+    display: none !important;
+    opacity: 0 !important;
+    pointer-events: none;
   }
 
   .hero-mobile-carousel {
     display: block;
   }
 }
+
 @media (max-width: 480px) {
   .hero { height: 65vh; }
   
@@ -220,7 +222,6 @@ h2 { font-size: 2rem; text-align: center; margin-bottom: 1rem; text-transform: u
     transform: scale(1.08);
   }
 }
-
 
 /* OVERLAY (inchangé) */
 .hero::before {

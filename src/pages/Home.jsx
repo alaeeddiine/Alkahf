@@ -171,10 +171,8 @@ const Home = () => {
 
         {/* ===== CAROUSEL MOBILE ===== */}
         <div className="hero-mobile-carousel">
-          <div class="hero-mobile-carousel">
-            <div class="carousel-slide slide-1"></div>
-            <div class="carousel-slide slide-2"></div>
-          </div>
+          <div className="carousel-slide slide-1"></div>
+          <div className="carousel-slide slide-2"></div>
         </div>
 
         {/* ===== CONTENU ===== */}
