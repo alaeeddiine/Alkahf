@@ -178,7 +178,7 @@ const Home = () => {
         {/* ===== CONTENU ===== */}
         <div className="hero-content">
           <h1>
-            La caverne fut <span className="highlight">pour les Croyants.</span>
+            La caverne fut un Refuge <span className="highlight">pour les Croyants.</span>
           </h1>
           <p>
             Explorez notre collection de livres authentiques. Profitez d'une expérience
