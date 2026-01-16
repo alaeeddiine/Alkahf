@@ -4,7 +4,7 @@ import { CartContext } from "../context/CartContext";
 import { db } from "../firebase/config";
 import { collection, query, where, getDocs, addDoc, serverTimestamp } from "firebase/firestore";
 import { PayPalButtons } from "@paypal/react-paypal-js";
-import { FaTag, FaLock, FaChevronLeft } from "react-icons/fa";
+import { FaLock, FaChevronLeft } from "react-icons/fa";
 
 const europeanCountries = [
   "France","Germany","Italy","Spain","Portugal","Belgium","Netherlands","Luxembourg",

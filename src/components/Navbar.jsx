@@ -7,8 +7,7 @@ import {
   FaHome, 
   FaInfoCircle, 
   FaBook, 
-  FaBox,
-  FaChild
+  FaBox
 } from "react-icons/fa";
 import { CartContext } from "../context/CartContext";
 import logo from "../assets/logo.png";

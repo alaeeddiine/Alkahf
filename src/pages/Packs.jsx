@@ -3,7 +3,6 @@ import { db } from "../firebase/config";
 import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
 import { CartContext } from "../context/CartContext";
 import {
-  FaStar,
   FaTimes,
   FaShoppingCart,
   FaShieldAlt,

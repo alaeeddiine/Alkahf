@@ -3,11 +3,10 @@ import { Link } from "react-router-dom";
 import {
   FaArrowRight,
   FaBookOpen,
-  FaFire,
   FaShieldAlt,
   FaShippingFast,
   FaHeadset,
-  FaEnvelope,
+  FaEnvelope, FaFire
 } from "react-icons/fa";
 import {
   collection,
@@ -37,7 +36,6 @@ const Home = () => {
   const [showReview, setShowReview] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [videoReady, setVideoReady] = useState(false);
-  const [isIOS, setIsIOS] = useState(false);
   const [reviewData, setReviewData] = useState({
     name: "",
     email: "",
