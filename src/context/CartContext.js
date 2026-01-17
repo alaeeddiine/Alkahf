@@ -16,15 +16,22 @@ export const CartProvider = ({ children }) => {
     sessionStorage.setItem("cart", JSON.stringify(cartItems));
   }, [cartItems]);
 
-  const addToCart = useCallback((product) => {
+  const addToCart = useCallback((product, overrideQuantity = false) => {
     setCartItems(prev => {
       const exist = prev.find(i => i.id === product.id);
       if (exist) {
+        // Si overrideQuantity = true, on met exactement la quantité passée
+        if (overrideQuantity) {
+          return prev.map(i =>
+            i.id === product.id ? { ...i, quantity: product.quantity } : i
+          );
+        }
+        // Sinon, on ajoute la quantité passée au panier existant
         return prev.map(i =>
-          i.id === product.id ? { ...i, quantity: i.quantity + 1 } : i
+          i.id === product.id ? { ...i, quantity: i.quantity + (product.quantity || 1) } : i
         );
       }
-      return [...prev, { ...product, quantity: 1 }];
+      return [...prev, { ...product, quantity: product.quantity || 1 }];
     });
   }, []);
 
@@ -44,7 +51,7 @@ export const CartProvider = ({ children }) => {
   }, []);
 
   const cartCount = cartItems.reduce((s, i) => s + (i.quantity || 0), 0);
-  const totalPrice = cartItems.reduce((s, i) => s + (i.price || 0) * i.quantity, 0);
+  const totalPrice = cartItems.reduce((s, i) => s + (i.price || 0) * (i.quantity || 1), 0);
 
   return (
     <CartContext.Provider value={{

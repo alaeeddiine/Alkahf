@@ -204,8 +204,7 @@ const KidsBooks = () => {
                   <div className="book-info">
                     <span className="book-category-tag">{book.category}</span>
                     <h3 className="book-title">{book.title}</h3>
-                    <p className="book-author">{book.author}</p>
-                    {renderStars(book.rating)}
+                    <p className="book-author">Edition {book.edition}</p>
 
                     <div className="book-card-footer">
                       {book.stock === 0 ? (

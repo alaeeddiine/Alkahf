@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext } from "react"; 
 import { Link } from "react-router-dom";
 import { CartContext } from "../context/CartContext";
 import { db } from "../firebase/config";
@@ -19,6 +19,11 @@ const priceWithTax = (price) => +(price * (1 + TAX_RATE / 100)).toFixed(2);
 
 const Checkout = () => {
   const { cartItems, clearCart } = useContext(CartContext);
+  const locationState = window.history.state?.usr || {};
+  const bookFromState = locationState?.book && locationState.quantity ? [{...locationState.book, quantity: locationState.quantity}] : [];
+
+  // Utiliser soit le panier, soit le livre passé via state
+  const items = cartItems.length > 0 ? cartItems : bookFromState;
 
   const [formData, setFormData] = useState({
     name: "", email: "", address: "", city: "", country: "", zipCode: "", promoCode: "",
@@ -39,7 +44,7 @@ const Checkout = () => {
 
   // 🔹 Calcul des totaux TTC
   useEffect(() => {
-    const subtotal = cartItems.reduce(
+    const subtotal = items.reduce(
       (sum, item) =>
         sum +
         priceWithTax(item.promoPrice ?? item.price ?? 0) * item.quantity,
@@ -56,8 +61,7 @@ const Checkout = () => {
       tax,
       grandTotal: totalAfterDiscount + shipping,
     });
-  }, [cartItems, promoDiscountValue]);
-
+  }, [items, promoDiscountValue]);
 
   const handleInputChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
@@ -88,7 +92,7 @@ const Checkout = () => {
         return;
       }
 
-      const subtotal = cartItems.reduce(
+      const subtotal = items.reduce(
         (sum, item) =>
           sum +
           priceWithTax(item.promoPrice ?? item.price ?? 0) * item.quantity,
@@ -110,11 +114,10 @@ const Checkout = () => {
     }
   };
 
-
   const handlePaymentSuccess = async (details) => {
     try {
       await addDoc(collection(db, "orders"), {
-        items: cartItems.map(item => ({
+        items: items.map(item => ({
           id: item.id,
           title: item.title,
           quantity: item.quantity,
@@ -139,7 +142,7 @@ const Checkout = () => {
     }
   };
 
-  if (cartItems.length === 0 && !paymentSuccess) {
+  if (items.length === 0 && !paymentSuccess) {
     return (
       <div className="empty-checkout">
         <div className="empty-content">
@@ -200,7 +203,7 @@ const Checkout = () => {
         <aside className="checkout-summary-sidebar">
           <div className="summary-sticky-card">
             <h3 className="summary-title">Votre Sélection</h3>
-            {cartItems.map(item => (
+            {items.map(item => (
               <div key={item.id} className="mini-item-card">
                 <img src={item.images?.[0]} alt={item.title} className="mini-img" />
                 <div className="mini-details">
@@ -214,7 +217,6 @@ const Checkout = () => {
             <div className="summary-calculation">
               <div className="calc-row"><span>Sous-total (TTC)</span><span>{totals.subtotal.toFixed(2)}€</span></div>
               <div className="calc-row"><span>Frais d'envoi</span><span>{totals.shipping === 0 ? "Offerts" : `${totals.shipping.toFixed(2)}€`}</span></div>
-              {/* <div className="calc-row"><span>Taxe (21%) incluse</span><span>{totals.tax.toFixed(2)}€</span></div> */}
               {promoDiscountValue > 0 && (
                 <div className="calc-row discount-row">
                   <span>Réduction ({promoPercent}%)</span>
@@ -226,7 +228,7 @@ const Checkout = () => {
 
             <div className="payment-security-note"><FaLock /> Paiement 100% sécurisé et crypté</div>
 
-            {cartItems.length > 0 && (
+            {items.length > 0 && (
               <PayPalButtons
                 style={{ layout: "vertical", color: "gold", shape: "rect", label: "paypal" }}
                 createOrder={(data, actions) => actions.order.create({

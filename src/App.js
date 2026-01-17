@@ -17,7 +17,9 @@ import Home from "./pages/Home";
 import About from "./pages/About";
 import Books from "./pages/Books";
 import KidsBooks from "./pages/KidsBooks";
+import BookDetails from "./pages/BookDetails";
 import Packs from "./pages/Packs";
+import PackDetails from "./pages/PackDetails";
 import Checkout from "./pages/Checkout"; 
 import LegalNotice from "./pages/LegalNotice";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
@@ -122,8 +124,10 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
             <Route path="/books" element={<Books />} />
-            <Route path="/Kids" element={<KidsBooks />} />
+            <Route path="/kids" element={<KidsBooks />} />
+            <Route path="/book/:id" element={<BookDetails />} />
             <Route path="/packs" element={<Packs />} />
+            <Route path="/pack/:id" element={<PackDetails />} />
             <Route path="/checkout" element={<Checkout />} /> 
             <Route path="/LegalNotice" element={<LegalNotice />} />
             <Route path="/PrivacyPolicy" element={<PrivacyPolicy />} />

@@ -35,14 +35,14 @@ const About = () => {
             <div className="lib-text-body font-amiri">
               <p className="drop-cap">
                 <span className="drop-word">Alkahf</span> est un espace conçu pour tous ceux qui aspirent à nourrir leur esprit et approfondir leur compréhension.
-              </p>ici, vous trouverez une sélection précieuse d’ouvrages soigneusement choisis pour enrichir vos connaissances, que ce soit en ‘aqîda (croyance), en étude du qur’ân, à travers des récits prophétiques, ou bien plus encore.
+              </p>Ici, vous trouverez une sélection précieuse d’ouvrages soigneusement choisis pour enrichir vos connaissances, que ce soit en ‘aqîda (croyance), en étude du qur’ân, à travers des récits prophétiques, ou bien plus encore.
               <p>
-                chaque livre, chaque édition, est sélectionné
+                Chaque livre, chaque édition, est sélectionné
                 avec une attention particulière, dans le souci
                 de vous offrir un contenu fiable, bénéfique et
-                authentique.
+                authentique. <br />
 
-                que cette quête du savoir soit pour vous une
+                Que cette quête du savoir soit pour vous une
                 source de patience, de lumière et de
                 satisfaction.              
               </p>

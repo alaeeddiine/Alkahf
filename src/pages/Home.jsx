@@ -6,7 +6,8 @@ import {
   FaShieldAlt,
   FaShippingFast,
   FaHeadset,
-  FaEnvelope, FaFire
+  FaEnvelope,
+  FaFire,
 } from "react-icons/fa";
 import {
   collection,
@@ -20,11 +21,12 @@ import {
 } from "firebase/firestore";
 import { db } from "../firebase/config";
 import heroVideo from "../assets/hero.mp4";
+import heroImg1 from "../assets/mobile1.jpeg"; 
+import heroImg2 from "../assets/mobile2.jpeg";
 
-/* ---------- TAX UTILS (IDENTIQUE À PACKS) ---------- */
+/* ---------- TAX UTILS ---------- */
 const TAX_RATE = 21;
-const getPriceWithTax = (price) =>
-  +(price * (1 + TAX_RATE / 100)).toFixed(2);
+const getPriceWithTax = (price) => +(price * (1 + TAX_RATE / 100)).toFixed(2);
 
 const Home = () => {
   const [latestBooks, setLatestBooks] = useState([]);
@@ -36,11 +38,10 @@ const Home = () => {
   const [showReview, setShowReview] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [videoReady, setVideoReady] = useState(false);
-  const [reviewData, setReviewData] = useState({
-    name: "",
-    email: "",
-    message: "",
-  });
+  const [reviewData, setReviewData] = useState({ name: "", email: "", message: "" });
+
+  const [currentSlide, setCurrentSlide] = useState(0); // Pour le carrousel mobile
+  const mobileSlides = [heroImg1, heroImg2]; // Images du carrousel
 
   // ---------- Newsletter ----------
   const handleNewsletterSubmit = async (e) => {
@@ -56,6 +57,7 @@ const Home = () => {
       setNewsletterMessage("Une erreur est survenue. Veuillez réessayer.");
     }
   };
+
   const reviews = [
     { message: "Un service client exceptionnel et des livres d'une qualité rare.", author: "Youssef B.", rating: 5 },
     { message: "Enfin une librairie en ligne qui garantit l'authenticité des sources.", author: "Leila K.", rating: 5 },
@@ -63,7 +65,7 @@ const Home = () => {
     { message: "Une sélection de livres magnifique, surtout les biographies.", author: "Fatima Z.", rating: 5 },
     { message: "Le site est très fluide sur mobile, l'expérience d'achat est vraiment agréable.", author: "Omar S.", rating: 4 },
   ];
-  
+
   const StarRating = ({ rating }) => (
     <div className="stars">
       {[1, 2, 3, 4, 5].map((star) => (
@@ -77,11 +79,8 @@ const Home = () => {
   // ---------- Promo utils ----------
   const applyPromo = (price, promo) => {
     if (!promo || promo.amount == null) return price;
-
-    // On considère que promo.amount est un pourcentage
     return +(price * (1 - promo.amount / 100)).toFixed(2);
   };
-
 
   const getGeneralPromos = async () => {
     const q = query(
@@ -97,43 +96,33 @@ const Home = () => {
   useEffect(() => {
     (async () => {
       setLoading(true);
-      const snap = await getDocs(
-        query(collection(db, "books"), orderBy("createdAt", "desc"), limit(4))
-      );
+      const snap = await getDocs(query(collection(db, "books"), orderBy("createdAt", "desc"), limit(4)));
       let books = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
       const promos = await getGeneralPromos();
       const promo = promos.find((p) => p.appliesTo === "all" || p.appliesTo === "books");
       if (promo) {
-        books = books.map((b) => ({
-          ...b,
-          promoPrice: applyPromo(b.price, promo),
-        }));
+        books = books.map((b) => ({ ...b, promoPrice: applyPromo(b.price, promo) }));
       }
       setLatestBooks(books);
       setLoading(false);
     })();
   }, []);
 
-  
   // ---------- Hero Video iOS Play Fix ----------
   useEffect(() => {
     const video = document.querySelector(".hero-video");
     if (!video) return;
-
     const tryPlay = () => {
       video.play().catch(() => {});
       window.removeEventListener("touchstart", tryPlay);
     };
-
     window.addEventListener("touchstart", tryPlay);
   }, []);
 
   // ---------- Fetch Pack ----------
   useEffect(() => {
     (async () => {
-      const snap = await getDocs(
-        query(collection(db, "packs"), orderBy("createdAt", "desc"), limit(1))
-      );
+      const snap = await getDocs(query(collection(db, "packs"), orderBy("createdAt", "desc"), limit(1)));
       if (!snap.empty) {
         let pack = { id: snap.docs[0].id, ...snap.docs[0].data() };
         const promos = await getGeneralPromos();
@@ -145,15 +134,27 @@ const Home = () => {
     })();
   }, []);
 
-  const formatPrice = (p) =>
-    new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" }).format(p);
+  const formatPrice = (p) => new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" }).format(p);
+
+  // ---------- Mobile Carousel ----------
+  useEffect(() => {
+    const isMobile = window.innerWidth <= 768;
+    if (!isMobile) return;
+
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % mobileSlides.length);
+    }, 6000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="home">
       {/* HERO */}
       <section className={`hero ${videoReady ? "video-loaded" : ""}`}>
+        {/* Vidéo sur ordinateur */}
         <video
-          className="hero-video"
+          className="hero-video desktop-only"
           muted
           loop
           playsInline
@@ -164,6 +165,18 @@ const Home = () => {
         >
           <source src={heroVideo} type="video/mp4" />
         </video>
+
+        {/* Carrousel sur mobile */}
+        <div className="mobile-carousel mobile-only">
+          {mobileSlides.map((img, index) => (
+            <img
+              key={index}
+              src={img}
+              alt={`Slide ${index + 1}`}
+              className={`carousel-slide ${currentSlide === index ? "active" : ""}`}
+            />
+          ))}
+        </div>
 
         <div className="hero-content">
           <h1>
@@ -188,8 +201,10 @@ const Home = () => {
       <section className="latest-books">
         <div className="container-inner">
           <div className="section-header">
-            <h2>Nos Meilleurs Ventes</h2>
-            <p className="section-subtitle">Découvrez les incontournables de notre librairie</p>
+            <h2>Nos Coups de Cœur</h2>
+            <p className="section-subtitle">
+              Découvrez les incontournables de notre librairie
+            </p>
           </div>
 
           {loading ? (
@@ -197,44 +212,60 @@ const Home = () => {
           ) : latestBooks.length === 0 ? (
             <p className="no-data">Aucun livre disponible pour le moment.</p>
           ) : (
-            <div className="books-grid">
-              {latestBooks.map(book => (
-                <div key={book.id} className="book-card">
-                  <div className="book-image">
-                    <img src={book.images?.[0] || book.image || "/placeholder.jpg"} alt={book.title} />
-                  </div>
-                  <div className="book-info">
-                    <div className="meta"><span>{book.category}</span></div>
-                    <h3>{book.title}</h3>
-                    <p className="author">Edition {book.edition}</p>
-                    <div className="book-footer">
-                      <span className="price">
-                        {book.promoPrice && book.promoPrice < book.price ? (
-                          <>
-                            <s>{formatPrice(getPriceWithTax(book.price))}</s>{" "}
-                            <strong>{formatPrice(getPriceWithTax(book.promoPrice))}</strong>
-                          </>
-                        ) : (
-                          formatPrice(getPriceWithTax(book.price))
-                        )}
-                      </span>
+            <>
+              <div className="books-grid">
+                {latestBooks.map((book) => (
+                  <Link
+                    key={book.id}
+                    to={`/book/${book.id}`}       // redirige vers la page BookDetails
+                    state={{ bookData: book }} // passe le livre complet
+                    className="book-card-link">
+                    <div className="book-card">
+                      <div className="book-image">
+                        <img
+                          src={book.images?.[0] || book.image || "/placeholder.jpg"}
+                          alt={book.title}
+                        />
+                      </div>
+
+                      <div className="book-info">
+                        <div className="meta">
+                          <span>{book.category}</span>
+                        </div>
+
+                        <h3>{book.title}</h3>
+                        <p className="author">Edition {book.edition}</p>
+
+                        <div className="book-footer">
+                          <span className="price">
+                            {book.promoPrice && book.promoPrice < book.price ? (
+                              <>
+                                <s>{formatPrice(getPriceWithTax(book.price))}</s>{" "}
+                                <strong>{formatPrice(getPriceWithTax(book.promoPrice))}</strong>
+                              </>
+                            ) : (
+                              formatPrice(getPriceWithTax(book.price))
+                            )}
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                    <Link
-                      to={book.category === "Livres enfants" ? "/kids" : "/books"}
-                      state={{ bookId: book.id }}
-                      className="btn-outline-small"
-                    >
-                      Voir les détails
-                    </Link>
-                  </div>
-                </div>
-              ))}
-            </div>
+                  </Link>
+                ))}
+              </div>
+
+              {/* BOUTON VERS LA PAGE LIVRES */}
+              <div className="books-section-btn">
+                <Link to="/books" className="btn-outline-small">
+                  Notre Librairie
+                </Link>
+              </div>
+            </>
           )}
         </div>
       </section>
 
-      {/* EXCLUSIVE PACK */}
+
       {/* EXCLUSIVE PACK */}
       <section className="exclusive-mini-luxe">
         <div className="mesh-gradient-subtle"></div>
@@ -247,54 +278,63 @@ const Home = () => {
           </div>
 
           {loadingPack ? (
-            <div className="mini-shimmer"></div>
+            <div className="loading-state">Chargement des Packs...</div>
+                ) : latestBooks.length === 0 ? (
+                <p className="no-data">Aucun Pack disponible pour le moment.</p>
           ) : (
             exclusivePack && (
-              <div className="mini-luxury-card">
-                <div className="card-inner-flex">
-                  <div className="mini-visual">
-                    <img
-                      src={exclusivePack.images?.[0] || exclusivePack.image}
-                      alt={exclusivePack.title}
-                    />
-                  </div>
-
-                  <div className="mini-content">
-                    <div className="text-top">
-                      <h3 className="pack-name">{exclusivePack.title}</h3>
-                      <p className="pack-summary">{exclusivePack.description}</p>
+              <Link
+                key={exclusivePack.id}
+                to={`/packs/${exclusivePack.id}`} // redirige vers PackDetails
+                state={{ packId: exclusivePack.id, packData: exclusivePack }} // passe le pack complet
+                className="mini-luxury-card-link"
+              >
+                <div className="mini-luxury-card">
+                  <div className="card-inner-flex">
+                    <div className="mini-visual">
+                      <img
+                        src={exclusivePack.images?.[0] || exclusivePack.image || "/placeholder.jpg"}
+                        alt={exclusivePack.title}
+                      />
                     </div>
 
-                    <div className="mini-action-row">
-                      <div className="price-minimal">
-                        {exclusivePack.promoPrice &&
-                        exclusivePack.promoPrice < exclusivePack.price ? (
-                          <>
-                            <span className="price-old">
-                              {formatPrice(getPriceWithTax(exclusivePack.price))}
-                            </span>
-                            <span className="price-val">
-                              {formatPrice(getPriceWithTax(exclusivePack.promoPrice))}
-                            </span>
-                          </>
-                        ) : (
-                          <span className="price-val">
-                            {formatPrice(getPriceWithTax(exclusivePack.price))}
-                          </span>
-                        )}
+                    <div className="mini-content">
+                      <div className="text-top">
+                        <h3 className="pack-name">{exclusivePack.title}</h3>
+                        <p className="pack-summary">{exclusivePack.description}</p>
                       </div>
 
-                      <Link to="/packs" className="mini-cta-black">
-                        Découvrir <FaArrowRight />
-                      </Link>
+                      <div className="mini-action-row">
+                        <div className="price-minimal">
+                          {exclusivePack.promoPrice && exclusivePack.promoPrice < exclusivePack.price ? (
+                            <>
+                              <span className="price-old">
+                                {formatPrice(getPriceWithTax(exclusivePack.price))}
+                              </span>
+                              <span className="price-val">
+                                {formatPrice(getPriceWithTax(exclusivePack.promoPrice))}
+                              </span>
+                            </>
+                          ) : (
+                            <span className="price-val">
+                              {formatPrice(getPriceWithTax(exclusivePack.price))}
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="mini-cta-black">
+                          Découvrir <FaArrowRight />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              </Link>
             )
           )}
         </div>
       </section>
+
 
       {/* WHY CHOOSE US */}
       <section className="why-choose">

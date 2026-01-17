@@ -33,8 +33,8 @@ const Footer = () => {
           <h4>Navigation</h4>
           <div className="gold-underline"></div>
           <ul>
-            <li><Link to="/books"><FaChevronRight /> Librairie</Link></li>
-            <li><Link to="/kids"><FaChevronRight /> Librairie adultes</Link></li>
+            <li><Link to="/books"><FaChevronRight /> Livres adultes</Link></li>
+            <li><Link to="/kids"><FaChevronRight /> Livvres enfants</Link></li>
             <li><Link to="/packs"><FaChevronRight /> Packs Exclusifs</Link></li>
             <li><Link to="/about"><FaChevronRight /> À Propos</Link></li>
           </ul>
