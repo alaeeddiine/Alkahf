@@ -285,7 +285,7 @@ const Home = () => {
             exclusivePack && (
               <Link
                 key={exclusivePack.id}
-                to={`/packs/${exclusivePack.id}`} // redirige vers PackDetails
+                to={`/pack/${exclusivePack.id}`} // redirige vers PackDetails
                 state={{ packId: exclusivePack.id, packData: exclusivePack }} // passe le pack complet
                 className="mini-luxury-card-link"
               >
