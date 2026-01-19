@@ -31,6 +31,7 @@ import AdminPacks from "./admin/AdminPacks";
 import AdminPromos from "./admin/AdminPromos";
 import AdminOrders from "./admin/AdminOrders";
 import NewsletterAdmin from "./admin/NewsletterAdmin";
+import ReviewsAdmin from "./admin/ReviewsAdmin";
 
 import { onAuthState } from "./firebase/config";
 import { CartProvider } from "./context/CartContext";
@@ -153,6 +154,7 @@ function App() {
             <Route path="promos" element={<AdminPromos />} />
             <Route path="orders" element={<AdminOrders />} />
             <Route path="newsletter" element={<NewsletterAdmin />} />
+            <Route path="reviews" element={<ReviewsAdmin />} />
           </Route>
 
           {/* 🔹 FALLBACK */}

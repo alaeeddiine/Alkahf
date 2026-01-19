@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { 
   FaBook, FaShoppingCart, FaTags, FaEnvelope, 
-  FaSignOutAlt, FaChartLine, FaBars, FaTimes, FaBox 
+  FaSignOutAlt, FaChartLine, FaBars, FaTimes, FaBox, FaStar
 } from "react-icons/fa";
 import logo from '../assets/logo.png';
 
@@ -23,6 +23,7 @@ const AdminLayout = ({ children }) => {
     { label: "Packs", icon: <FaBox />, path: "/admin/packs" },
     { label: "Marketing", icon: <FaTags />, path: "/admin/promos" },
     { label: "Newsletter", icon: <FaEnvelope />, path: "/admin/newsletter" },
+  { label: "Avis", icon: <FaStar />, path: "/admin/reviews" }
   ];
 
   return (

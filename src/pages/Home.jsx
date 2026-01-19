@@ -38,7 +38,7 @@ const Home = () => {
   const [showReview, setShowReview] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [videoReady, setVideoReady] = useState(false);
-  const [reviewData, setReviewData] = useState({ name: "", email: "", message: "" });
+  const [reviewData, setReviewData] = useState({ name: "", email: "", message: "", rating: 0 });
 
   const [currentSlide, setCurrentSlide] = useState(0); // Pour le carrousel mobile
   const mobileSlides = [heroImg1, heroImg2]; // Images du carrousel
@@ -58,13 +58,23 @@ const Home = () => {
     }
   };
 
-  const reviews = [
-    { message: "Un service client exceptionnel et des livres d'une qualité rare.", author: "Youssef B.", rating: 5 },
-    { message: "Enfin une librairie en ligne qui garantit l'authenticité des sources.", author: "Leila K.", rating: 5 },
-    { message: "La livraison est ultra rapide et les livres arrivent très bien protégés.", author: "Ahmed M.", rating: 4 },
-    { message: "Une sélection de livres magnifique, surtout les biographies.", author: "Fatima Z.", rating: 5 },
-    { message: "Le site est très fluide sur mobile, l'expérience d'achat est vraiment agréable.", author: "Omar S.", rating: 4 },
-  ];
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await addDoc(collection(db, "reviews"), {
+        fullName: reviewData.name,
+        email: reviewData.email,
+        review: reviewData.message,
+        rating: reviewData.rating,
+        active: false, // <-- important pour que l'admin active
+        createdAt: serverTimestamp(),
+      });
+      setSubmitted(true);
+      setReviewData({ name: "", email: "", message: "", rating: 0 });
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const StarRating = ({ rating }) => (
     <div className="stars">
@@ -146,6 +156,37 @@ const Home = () => {
     }, 6000);
 
     return () => clearInterval(interval);
+  }, []);
+
+  // fetch reviews 
+  const [reviews, setReviews] = useState([]);
+  const [reviewsLoading, setReviewsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        const q = query(
+          collection(db, "reviews"),
+          orderBy("createdAt", "desc"),
+          limit(10)
+        );
+
+        const snap = await getDocs(q);
+
+        const data = snap.docs
+          .map(doc => ({ id: doc.id, ...doc.data() }))
+          .filter(r => r.active === true) // ✅ FILTRAGE ICI
+          .slice(0, 6);
+
+        setReviews(data);
+      } catch (err) {
+        console.error("Erreur fetch reviews:", err);
+      } finally {
+        setReviewsLoading(false);
+      }
+    };
+
+    fetchReviews();
   }, []);
 
   return (
@@ -375,13 +416,19 @@ const Home = () => {
           </p>
 
           <div className="reviews-grid">
-            {reviews.map((review, index) => (
-              <div className="review-card" key={index}>
-                <StarRating rating={review.rating} />
-                <p>"{review.message}"</p>
-                <span>- {review.author}</span>
-              </div>
-            ))}
+            {reviewsLoading ? (
+              <p>Chargement des avis...</p>
+            ) : reviews.length === 0 ? (
+              <p>Aucun avis disponible pour le moment.</p>
+            ) : (
+              reviews.map((rev) => (
+                <div key={rev.id} className="review-card">
+                  <StarRating rating={rev.rating} />
+                  <p>"{rev.review}"</p>
+                  <span>- {rev.fullName}</span>
+                </div>
+              ))
+            )}
           </div>
 
           <button className="reviews-arrow prev" aria-label="Avis précédent">‹</button>
@@ -396,94 +443,114 @@ const Home = () => {
 
           {showReview && (
             <div className="popup-overlay">
-              <div className="popup-card floating-card">
-                <div className="popup-header">
-                  <h2>Laisser un avis</h2>
-                  <button className="close-btn" onClick={() => setShowReview(false)}>×</button>
-                </div>
-
-                {!submitted ? (
-                  <form
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      console.log("Avis soumis:", reviewData);
-                      setSubmitted(true);
-                      setReviewData({ name: "", email: "", message: "" });
-                    }}
-                    className="popup-form"
-                  >
-                    <div className="input-group">
-                      <label>Nom</label>
-                      <input
-                        type="text"
-                        name="name"
-                        value={reviewData.name}
-                        onChange={(e) =>
-                          setReviewData({ ...reviewData, name: e.target.value })
-                        }
-                        required
-                        placeholder="Votre nom"
-                      />
-                    </div>
-
-                    <div className="input-group">
-                      <label>Email</label>
-                      <input
-                        type="email"
-                        name="email"
-                        value={reviewData.email}
-                        onChange={(e) =>
-                          setReviewData({ ...reviewData, email: e.target.value })
-                        }
-                        required
-                        placeholder="Votre email"
-                      />
-                    </div>
-
-                    <div className="input-group">
-                      <label>Avis</label>
-                      <textarea
-                        name="message"
-                        value={reviewData.message}
-                        onChange={(e) =>
-                          setReviewData({ ...reviewData, message: e.target.value })
-                        }
-                        required
-                        placeholder="Votre avis"
-                        rows={4}
-                      />
-                    </div>
-                    <div className="input-group">
-                      <label>Note</label>
-                      <div className="stars selectable">
-                        {[1, 2, 3, 4, 5].map((star) => (
-                          <span
-                            key={star}
-                            className={star <= reviewData.rating ? "star filled" : "star"}
-                            onClick={() => setReviewData({ ...reviewData, rating: star })}
-                          >
-                            ★
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                    
-                    <button type="submit" className="submit-action-btn">
-                      Envoyer
-                    </button>
-                  </form>
-                ) : (
-                  <div className="confirmation-message">
-                    <p>Merci pour votre avis ! Il a bien été envoyé.</p>
-                    <button
-                      onClick={() => setShowReview(false)}
-                      className="submit-action-btn"
-                    >
-                      Fermer
-                    </button>
+              <section className="reviews popup-reviews">
+                <div className="container-inner">
+                  <div className="popup-header">
+                    <h2>Laisser un avis</h2>
+                    <button className="close-btn" onClick={() => setShowReview(false)}>×</button>
                   </div>
-                )}
-              </div>
+
+                  {!submitted ? (
+                    <form
+                      onSubmit={async (e) => {
+                        e.preventDefault();
+
+                        if (!reviewData.rating) {
+                          alert("Veuillez donner une note.");
+                          return;
+                        }
+
+                        try {
+                          await addDoc(collection(db, "reviews"), {
+                            fullName: reviewData.name,
+                            email: reviewData.email,
+                            review: reviewData.message,
+                            rating: reviewData.rating,
+                            active: false,
+                            createdAt: serverTimestamp(),
+                          });
+
+                          setSubmitted(true);
+                          setReviewData({ name: "", email: "", message: "", rating: 0 });
+                        } catch (error) {
+                          console.error(error);
+                        }
+                      }}
+                      className="reviews-grid"
+                    >
+                      <div className="review-card review-form-card">
+
+                        <div className="input-group">
+                          <label>Nom</label>
+                          <input
+                            type="text"
+                            value={reviewData.name}
+                            onChange={(e) =>
+                              setReviewData({ ...reviewData, name: e.target.value })
+                            }
+                            required
+                          />
+                        </div>
+
+                        <div className="input-group">
+                          <label>Email</label>
+                          <input
+                            type="email"
+                            value={reviewData.email}
+                            onChange={(e) =>
+                              setReviewData({ ...reviewData, email: e.target.value })
+                            }
+                            required
+                          />
+                        </div>
+
+                        <div className="input-group">
+                          <label>Avis</label>
+                          <textarea
+                            value={reviewData.message}
+                            onChange={(e) =>
+                              setReviewData({ ...reviewData, message: e.target.value })
+                            }
+                            rows={4}
+                            required
+                          />
+                        </div>
+
+                        <div className="input-group">
+                          <label>Note</label>
+                          <div className="stars selectable">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <span
+                                key={star}
+                                className={star <= reviewData.rating ? "star filled" : "star"}
+                                onClick={() =>
+                                  setReviewData({ ...reviewData, rating: star })
+                                }
+                              >
+                                ★
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+
+                        <button type="submit" className="btn-outline-small">
+                          Envoyer l’avis
+                        </button>
+                      </div>
+                    </form>
+                  ) : (
+                    <div className="review-card confirmation-message">
+                      <p>Merci pour votre avis !</p>
+                      <button
+                        onClick={() => setShowReview(false)}
+                        className="btn-outline-small"
+                      >
+                        Fermer
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </section>
             </div>
           )}
         </div>

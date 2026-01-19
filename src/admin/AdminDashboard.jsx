@@ -9,7 +9,7 @@ import {
   FaArrowUp,
   FaChartLine,
   FaChevronRight,
-  FaRegCalendarAlt
+  FaRegCalendarAlt,
 } from "react-icons/fa";
 
 const AdminDashboard = () => {

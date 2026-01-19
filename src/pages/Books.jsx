@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import { useSearchParams, useNavigate, Link} from 'react-router-dom';
 import { getAllBooks, getBooksByCategory } from "../firebase/config";
 import { CartContext } from "../context/CartContext";
-import { FaShoppingCart, FaSearch, FaTimes, FaFilter, FaSortAmountDown } from 'react-icons/fa';
+import { FaSearch, FaTimes, FaFilter, FaSortAmountDown } from 'react-icons/fa';
 import { db } from "../firebase/config";
 import { collection, getDocs, query, where } from "firebase/firestore";
 
