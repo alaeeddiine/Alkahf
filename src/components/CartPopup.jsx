@@ -42,12 +42,12 @@ const CartPopup = ({ isOpen, onClose }) => {
 
   const calculateShipping = (amount) => {
     if (amount === 0) return 0;
-    if (amount < 50) return 5;
-    if (amount < 100) return 10;
+    if (amount < 49.99) return 5;
+    if (amount < 99.99) return 10;
     return 0;
   };
 
-  const shipping = calculateShipping(subtotal);
+  const shipping = calculateShipping(subtotalTTC);
   const grandTotalTTC = subtotalTTC + shipping;
 
   // ---------- GESTION STOCK ----------
@@ -142,10 +142,14 @@ const CartPopup = ({ isOpen, onClose }) => {
                 <span className={shipping === 0 ? "free-text" : ""}>{shipping === 0 ? "Gratuite" : `${shipping.toFixed(2)} €`}</span>
               </div>
               <div className="sum-line grand-total">
-                <span>Total</span>
+                <span>Total</span> 
                 <span>{grandTotalTTC.toFixed(2)} €</span>
               </div>
-              {subtotal < 100 && <p className="shipping-hint">Plus que {(100 - subtotal).toFixed(2)} € pour bénéficier de la livraison gratuite 🚚</p>}
+              {subtotalTTC < 100 && (
+                <p className="shipping-hint">
+                  Plus que {(100 - subtotalTTC).toFixed(2)} € pour bénéficier de la livraison gratuite 🚚
+                </p>
+              )}
             </div>
 
             <Link to="/checkout" className="checkout-btn-premium" onClick={onClose}>

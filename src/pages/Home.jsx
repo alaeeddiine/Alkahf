@@ -417,7 +417,7 @@ const Home = () => {
 
           <div className="reviews-grid">
             {reviewsLoading ? (
-              <p>Chargement des avis...</p>
+              <div className="loading-state">Chargement des livres...</div>
             ) : reviews.length === 0 ? (
               <p>Aucun avis disponible pour le moment.</p>
             ) : (
@@ -504,17 +504,28 @@ const Home = () => {
                           />
                         </div>
 
-                        <div className="input-group">
+                        <div className="input-group review-textarea-group">
                           <label>Avis</label>
+
                           <textarea
                             value={reviewData.message}
-                            onChange={(e) =>
-                              setReviewData({ ...reviewData, message: e.target.value })
-                            }
+                            onChange={(e) => {
+                              const text = e.target.value;
+                              if (text.length <= 170) {
+                                setReviewData({ ...reviewData, message: text });
+                              }
+                            }}
+                            maxLength={170}
                             rows={4}
                             required
+                            placeholder="Exprimez votre avis"
                           />
+
+                          <div className="char-counter">
+                            {reviewData.message.length} / 170
+                          </div>
                         </div>
+
 
                         <div className="input-group">
                           <label>Note</label>

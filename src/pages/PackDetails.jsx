@@ -122,22 +122,61 @@ const PackDetails = () => {
             {/* Quantité + prix */}
             <div className="quantity-price">
               <label>Quantité :</label>
-              <input type="number" min="1" value={quantity} onChange={e => setQuantity(Math.max(1, Number(e.target.value)))} />
-              <span className="price">
+
+              <input
+                type="number"
+                min="1"
+                max={5} // limite à 5 exemplaires
+                value={quantity}
+                onChange={e => {
+                  const value = Math.max(1, Number(e.target.value));
+                  setQuantity(Math.min(value, 5)); // ne dépasse jamais 5
+                }}
+              />
+
+              {quantity > 5 && (
+                <p style={{ color: "red", fontSize: "0.85rem", marginTop: "4px" }}>
+                  Quantité maximale : 5
+                </p>
+              )}
+
+              {hasDiscount && <div className="discount-badge">-{discountPercent}%</div>}
+
+              <span className="price-packs">
                 {hasDiscount ? (
                   <>
-                    <s>{getPriceWithTax(pack.price).toLocaleString("fr-FR", { style: "currency", currency: "EUR" })}</s>{" "}
-                    <strong>{getPriceWithTax(pack.promoPrice).toLocaleString("fr-FR", { style: "currency", currency: "EUR" })}</strong>
+                    <s>
+                      {(getPriceWithTax(pack.price) * quantity).toLocaleString("fr-FR", {
+                        style: "currency",
+                        currency: "EUR",
+                      })}
+                    </s>{" "}
+                    <strong>
+                      {(getPriceWithTax(pack.promoPrice) * quantity).toLocaleString("fr-FR", {
+                        style: "currency",
+                        currency: "EUR",
+                      })}
+                    </strong>
                   </>
                 ) : (
-                  <span>{getPriceWithTax(pack.price).toLocaleString("fr-FR", { style: "currency", currency: "EUR" })}</span>
+                  <span>
+                    {(getPriceWithTax(pack.price) * quantity).toLocaleString("fr-FR", {
+                      style: "currency",
+                      currency: "EUR",
+                    })}
+                  </span>
                 )}
               </span>
             </div>
 
+
             {/* Actions */}
             <div className="book-actions"> {/* same as book-actions */}
-              <button className="btn btn-primary" onClick={handleAddToCart}>
+              <button
+                className="btn btn-primary"
+                onClick={handleAddToCart}
+                disabled={quantity > pack.stock}
+              >
                 Ajouter au panier <FaShoppingCart style={{ marginLeft: "8px" }} />
               </button>
               <button className="btn btn-sec-book" onClick={handleCheckout}>
@@ -145,10 +184,16 @@ const PackDetails = () => {
               </button>
             </div>
 
+            {/* Politique de retour */}
+            <div className="return-badge">
+              <center><strong> Expédition sous 24h - Frais offerts dés 100€ d'achat</strong></center> <br />
+              <strong> Politique de retour:</strong> vous disposez de 14 jours pour retourner votre Articles après sa réception. 
+            </div>
+
             {/* Description */}
             <div className="book-description">
               <h2>Description</h2>
-              <p>{pack.description || "Aucune description disponible."}</p>
+              <p>{pack.description || "aucune description pour le moment"}</p>
             </div>
 
             {/* Livres inclus */}

@@ -881,7 +881,6 @@ h2 { font-size: 2rem; text-align: center; margin-bottom: 1rem; text-transform: u
   
 }
 
-
 @keyframes floatCard {
   0%, 100% { transform: translateY(0) rotateY(-15deg) rotateX(5deg); }
   50% { transform: translateY(-20px) rotateY(-5deg) rotateX(2deg); }
@@ -1170,7 +1169,6 @@ h2 { font-size: 2rem; text-align: center; margin-bottom: 1rem; text-transform: u
 .stars.selectable .star:hover {
   transform: scale(1.2);
 }
-
 
 
 /* =========================================
@@ -1637,6 +1635,12 @@ h2 { font-size: 2rem; text-align: center; margin-bottom: 1rem; text-transform: u
   gap: 2rem;
   align-items: start;
 }
+.price-book {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--gold);
+  margin-top: 0.5rem;
+}
 
 .book-images {
   position: relative;
@@ -1846,9 +1850,46 @@ h2 { font-size: 2rem; text-align: center; margin-bottom: 1rem; text-transform: u
   border-radius: 0.3rem;
 }
 
-/* Description */
-.book-description h2 { font-size: 1.4rem; margin: 1rem 0 0.5rem; font-weight: 600; }
-.book-description p { font-size: 1rem; line-height: 1.6; color: var(--gray); }
+.book-description {
+  margin-top: 30px;
+  padding: 20px;
+  background: #ffffff; /* fond blanc pour lisibilité */
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  line-height: 1.6;
+}
+
+.book-description h2 {
+  font-family: var(--font-cairo);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 12px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 6px;
+}
+
+.book-description p {
+  font-family: var(--font-amiri);
+  font-size: 1rem;
+  color: #333;
+  margin: 0;
+}
+
+/* Responsive : ajustement sur petits écrans */
+@media (max-width: 600px) {
+  .book-description {
+    padding: 15px;
+  }
+
+  .book-description h2 {
+    font-size: 1.1rem;
+  }
+
+  .book-description p {
+    font-size: 0.95rem;
+  }
+}
 
 /* ================= RESPONSIVE ================= */
 @media screen and (max-width: 1024px) {
@@ -2005,7 +2046,7 @@ h2 { font-size: 2rem; text-align: center; margin-bottom: 1rem; text-transform: u
 }
 
 .book-title {
-  font-size: 1rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: var(--black);
   margin-bottom: 0.3rem;
@@ -2582,6 +2623,66 @@ h2 { font-size: 2rem; text-align: center; margin-bottom: 1rem; text-transform: u
    PACKS PAGE - CINEMATIC PREMIUM DESIGN
    Style: Beige / Noir / Gold
    ========================================= */
+.pack-included-books {
+  margin-top: 30px;
+  padding: 20px;
+  background: #fafafa; /* léger fond pour distinguer la section */
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.pack-included-books h3 {
+  font-family: var(--font-cairo);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 12px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 6px;
+}
+
+.pack-included-books ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pack-included-books ul li {
+  font-family: var(--font-amiri);
+  font-size: 0.95rem;
+  color: #333;
+  padding-left: 12px;
+  position: relative;
+}
+
+/* Petit bullet personnalisé */
+.pack-included-books ul li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: var(--rev-gold);
+  font-weight: bold;
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+/* Responsive : réduit le padding sur mobile */
+@media (max-width: 600px) {
+  .pack-included-books {
+    padding: 15px;
+  }
+
+  .pack-included-books h3 {
+    font-size: 1rem;
+  }
+
+  .pack-included-books ul li {
+    font-size: 0.9rem;
+  }
+}
 
 .cinematic-page {
   background-color: var(--white);
@@ -2823,110 +2924,6 @@ h2 { font-size: 2rem; text-align: center; margin-bottom: 1rem; text-transform: u
   color: var(--white);
 }
 
-/* --- 4. LUXURY MODAL --- */
-.cinematic-overlay {
-  position: fixed;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0,0,0,0.95);
-  backdrop-filter: blur(8px);
-  z-index: 3000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2rem;
-}
-
-.cinematic-modal {
-  background: var(--white);
-  width: 100%;
-  max-width: 1100px;
-  max-height: 90vh;
-  position: relative;
-  display: flex;
-  overflow: hidden;
-  animation: slideUp 0.5s ease-out;
-}
-
-.modal-content-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  height: 100%;
-  overflow-y: auto;
-  animation: modalScaleUp 0ms ease-out;
-
-}
-
-.modal-visual-side {
-  background: var(--beige);
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 3rem;
-  
-}
-
-.modal-visual-side img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  filter: drop-shadow(0 20px 40px rgba(0,0,0,0.15));
-}
-
-.modal-text-side {
-  padding: 5rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.modal-text-side h2 {
-  font-size: 3rem;
-  font-family: serif;
-  margin-bottom: 2rem;
-}
-
-.modal-text-side p {
-  font-size: 1.1rem;
-  line-height: 1.8;
-  color: var(--gray);
-  margin-bottom: 3rem;
-}
-
-.cta-cinematic {
-  background: var(--black);
-  color: var(--white);
-  padding: 1.5rem 3rem;
-  border: none;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 15px;
-  cursor: pointer;
-  transition: var(--transition);
-  align-self: flex-start;
-}
-
-.cta-cinematic:hover {
-  background: var(--gold);
-  padding-right: 4rem;
-}
-
-.close-cinematic {
-  position: absolute;
-  top: 30px;
-  right: 30px;
-  background: transparent;
-  border: none;
-  color: var(--black);
-  font-size: 1.5rem;
-  cursor: pointer;
-  z-index: 10;
-}
-
 /* --- 5. LOADER ANIMATION --- */
 .cinematic-loader {
   height: 100vh;
@@ -3052,74 +3049,6 @@ h2 { font-size: 2rem; text-align: center; margin-bottom: 1rem; text-transform: u
     transition: transform 0.5s ease;
 }
 
-/* --- Côté Infos (Droite) --- */
-.modal-info-side {
-    flex: 0.9;
-    display: flex;
-    flex-direction: column;
-    padding: 0; /* Géré par les sections internes */
-    background: var(--white);
-}
-
-.info-header {
-    padding: 4rem 4rem 2rem;
-}
-
-.pack-category {
-    color: var(--gold);
-    text-transform: uppercase;
-    letter-spacing: 3px;
-    font-size: 0.75rem;
-    font-weight: 700;
-}
-
-.pack-title {
-    font-size: 2.8rem;
-    font-family: serif;
-    margin: 1rem 0;
-    line-height: 1.1;
-}
-
-.pack-price-tag {
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
-    margin-top: 1rem;
-}
-
-.pack-price-tag .amount {
-    font-size: 2.2rem;
-    font-weight: 800;
-}
-
-.pack-price-tag .currency {
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: var(--gold);
-}
-
-.pack-price-tag .old-amount {
-    text-decoration: line-through;
-    color: var(--gray);
-    margin-left: 10px;
-}
-
-/* --- Section de Détails Scrollable --- */
-.scrollable-details {
-    flex: 1;
-    overflow-y: auto;
-    padding: 0 4rem;
-    scrollbar-width: thin;
-    scrollbar-color: var(--gold) transparent;
-}
-
-.pack-description {
-    font-size: 1.05rem;
-    line-height: 1.7;
-    color: var(--gray);
-    margin-bottom: 2.5rem;
-}
-
 /* Grille de Spécifications Professionnelle */
 .specs-container h3 {
     font-size: 0.9rem;
@@ -3155,6 +3084,13 @@ h2 { font-size: 2rem; text-align: center; margin-bottom: 1rem; text-transform: u
     color: var(--black);
 }
 
+.price-packs {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--gold);
+    margin-top: auto;
+}
+
 /* --- Actions & CTA --- */
 .modal-actions {
     padding: 2rem 4rem 4rem;
@@ -3186,6 +3122,10 @@ h2 { font-size: 2rem; text-align: center; margin-bottom: 1rem; text-transform: u
     background: rgba(255,255,255,0.1);
     padding: 5px 15px;
     border-radius: 2px;
+}
+.add-to-cart-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .shipping-note {

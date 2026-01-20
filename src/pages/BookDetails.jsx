@@ -101,30 +101,65 @@ const BookDetails = () => {
 
           {/* ---------------- INFO LIVRE ---------------- */}
           <div className="book-info-panel">
-            {hasDiscount && <div className="discount-badge">-{discountPercent}%</div>}
             <h1 className="book-title">{book.title}</h1>
             <p className="author">Par <strong>{book.author || "Auteur inconnu"}</strong></p>
             <p className="edition">Édition <strong>{book.edition}</strong></p>
+            <p className="edition">Langue: <strong>{book.language}</strong></p>
 
             {/* Quantité + prix */}
             <div className="quantity-price">
               <label>Quantité :</label>
-              <input type="number" min="1" value={quantity} onChange={e => setQuantity(Math.max(1, Number(e.target.value)))} />
-              <span className="price">
+
+              <input
+                type="number"
+                min="1"
+                value={quantity}
+                onChange={e => {
+                  const value = Math.max(1, Number(e.target.value));
+                  setQuantity(Math.min(value, book.stock));
+                }}
+              />
+
+              {quantity > book.stock && (
+                <p style={{ color: "red", fontSize: "0.85rem", marginTop: "4px" }}>
+                  Stock insuffisant pour cette quantité
+                </p>
+              )}
+
+              {hasDiscount && (
+                <div className="discount-badge">-{discountPercent}%</div>
+              )}
+
+              <span className="price-book">
                 {hasDiscount ? (
                   <>
-                    <s>{getPriceWithTax(book.price).toLocaleString("fr-FR", { style: "currency", currency: "EUR" })}</s>{" "}
-                    <strong>{getPriceWithTax(book.promoPrice).toLocaleString("fr-FR", { style: "currency", currency: "EUR" })}</strong>
+                    <s>
+                      {(getPriceWithTax(book.price) * quantity).toLocaleString("fr-FR", {
+                        style: "currency",
+                        currency: "EUR",
+                      })}
+                    </s>{" "}
+                    <strong>
+                      {(getPriceWithTax(book.promoPrice) * quantity).toLocaleString(
+                        "fr-FR",
+                        { style: "currency", currency: "EUR" }
+                      )}
+                    </strong>
                   </>
                 ) : (
-                  <span>{getPriceWithTax(book.price).toLocaleString("fr-FR", { style: "currency", currency: "EUR" })}</span>
+                  <span>
+                    {(getPriceWithTax(book.price) * quantity).toLocaleString("fr-FR", {
+                      style: "currency",
+                      currency: "EUR",
+                    })}
+                  </span>
                 )}
               </span>
             </div>
 
             {/* Actions */}
             <div className="book-actions">
-              <button className="btn btn-primary" onClick={handleAddToCart}>
+              <button className="btn btn-primary" disabled={quantity > book.stock} onClick={handleAddToCart}>
                 Ajouter au panier <FaShoppingCart style={{ marginLeft: "8px" }} />
               </button>
               <button className="btn btn-sec-book" onClick={handleCheckout}>
@@ -134,13 +169,14 @@ const BookDetails = () => {
 
             {/* Politique de retour */}
             <div className="return-badge">
-              <strong>Politique retours:</strong> Vous disposez de 14 jours pour retourner votre article après sa réception.
+              <center><strong> Expédition sous 24h - Frais offerts dés 100€ d'achat</strong></center> <br />
+              <strong> Politique de retour:</strong> vous disposez de 14 jours pour retourner votre Articles après sa réception. 
             </div>
 
             {/* Description */}
             <div className="book-description">
               <h2>Description</h2>
-              <p>{book.description || "Aucune description disponible."}</p>
+              <p>{book.description || "aucune description pour le moment"}</p>
             </div>
           </div>
         </div>
