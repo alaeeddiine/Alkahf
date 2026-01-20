@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react"; 
-import { Link } from "react-router-dom";
+import { Link ,useNavigate } from "react-router-dom";
 import { CartContext } from "../context/CartContext";
 import { db } from "../firebase/config";
 import { collection, query, where, getDocs, addDoc, serverTimestamp } from "firebase/firestore";
@@ -21,6 +21,7 @@ const Checkout = () => {
   const { cartItems, clearCart } = useContext(CartContext);
   const locationState = window.history.state?.usr || {};
   const bookFromState = locationState?.book && locationState.quantity ? [{...locationState.book, quantity: locationState.quantity}] : [];
+  const navigate = useNavigate();
 
   // Utiliser soit le panier, soit le livre passé via state
   const items = cartItems.length > 0 ? cartItems : bookFromState;
@@ -167,7 +168,16 @@ const Checkout = () => {
   return (
     <div className="checkout-page">
       <header className="checkout-header">
-        <Link to="/cart" className="back-link"><FaChevronLeft /> Retour au panier</Link>
+        <Link
+          to="#"
+          className="back-link"
+          onClick={(e) => {
+            e.preventDefault();
+            navigate(-1); // retourne à la page précédente
+          }}
+        >
+          <FaChevronLeft /> Retour
+        </Link>
         <h1 className="details-title">Finaliser la <span className="gold-text">Commande</span></h1>
       </header>
 
