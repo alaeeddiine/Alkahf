@@ -3186,7 +3186,7 @@ h2 { font-size: 2rem; text-align: center; margin-bottom: 1rem; text-transform: u
    ========================= */
 
 :root {
-  --rev-gold: #c7a049;
+  --rev-gold: #D4AF37; 
   --rev-black: #121212;
   --rev-beige: #f4f1ea;
   --rev-white: #ffffff;
@@ -3445,6 +3445,63 @@ h2 { font-size: 2rem; text-align: center; margin-bottom: 1rem; text-transform: u
     position: relative;
     top: auto;
   }
+}
+/* =========================
+   EMPTY CHECKOUT
+========================= */
+.empty-checkout,
+.checkout-success {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+  background: var(--rev-beige);
+  padding: 40px 20px;
+  text-align: center;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.empty-content h2,
+.checkout-success h2 {
+  font-family: var(--font-cairo);
+  font-weight: 800;
+  font-size: 2rem;
+  color: var(--rev-black);
+}
+
+.empty-content p,
+.checkout-success p {
+  font-family: var(--font-amiri);
+  font-size: 1rem;
+  color: #555;
+  line-height: 1.5;
+}
+
+.buy-btn-large {
+  display: inline-block;
+  padding: 12px 30px;
+  background: var(--rev-black);
+  color: var(--rev-white);
+  font-family: var(--font-cairo);
+  font-weight: 700;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: 0.3s;
+}
+
+.buy-btn-large:hover {
+  background: var(--rev-gold);
+  color: var(--rev-black);
+}
+
+.checkout-success h2 {
+  color: var(--rev-gold);
+}
+
+.checkout-success p {
+  font-size: 1rem;
 }
 
 /* =========================================

@@ -147,7 +147,7 @@ const Checkout = () => {
       <div className="empty-checkout">
         <div className="empty-content">
           <h2 className="details-title">Votre panier est vide</h2>
-          <p>La quête du savoir commence par un premier ouvrage.</p>
+          <p>La quête du savoir commence par un premier ouvrage.</p> <br />
           <Link to="/books" className="buy-btn-large">Parcourir la collection</Link>
         </div>
       </div>
