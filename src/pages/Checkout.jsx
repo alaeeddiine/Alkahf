@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useContext } from "react"; 
-import { Link ,useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useContext, useMemo, useRef } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { CartContext } from "../context/CartContext";
 import { db } from "../firebase/config";
 import { collection, query, where, getDocs, addDoc, serverTimestamp } from "firebase/firestore";
@@ -13,18 +13,32 @@ const europeanCountries = [
   "Latvia","Lithuania","Malta","Cyprus","Bulgaria","Romania"
 ];
 
-const TAX_RATE = 21; // %
-
+const TAX_RATE = 21;
 const priceWithTax = (price) => +(price * (1 + TAX_RATE / 100)).toFixed(2);
 
 const Checkout = () => {
   const { cartItems, clearCart } = useContext(CartContext);
-  const locationState = window.history.state?.usr || {};
-  const bookFromState = locationState?.book && locationState.quantity ? [{...locationState.book, quantity: locationState.quantity}] : [];
+  const location = useLocation();
   const navigate = useNavigate();
 
-  // Utiliser soit le panier, soit le livre passé via state
+  const bookFromState =
+    location.state?.book && location.state?.quantity
+      ? [{ ...location.state.book, quantity: location.state.quantity }]
+      : [];
+
   const items = cartItems.length > 0 ? cartItems : bookFromState;
+
+  // sécuriser les items
+  const safeItems = useMemo(() => (Array.isArray(items) ? items : []), [items]);
+
+  // figer le panier et le montant pour PayPal
+  const frozenItemsRef = useRef(safeItems);
+  const paypalAmountRef = useRef(
+    safeItems.reduce(
+      (sum, item) => sum + priceWithTax(item.promoPrice ?? item.price ?? 0) * (item.quantity ?? 1),
+      0
+    )
+  );
 
   const [formData, setFormData] = useState({
     name: "", email: "", address: "", city: "", country: "", zipCode: "", promoCode: "",
@@ -43,12 +57,15 @@ const Checkout = () => {
     return 0;
   };
 
-  // 🔹 Calcul des totaux TTC
   useEffect(() => {
-    const subtotal = items.reduce(
+    if (safeItems.length === 0) {
+      setTotals({ subtotal: 0, shipping: 0, tax: 0, grandTotal: 0 });
+      return;
+    }
+
+    const subtotal = safeItems.reduce(
       (sum, item) =>
-        sum +
-        priceWithTax(item.promoPrice ?? item.price ?? 0) * item.quantity,
+        sum + priceWithTax(item.promoPrice ?? item.price ?? 0) * (item.quantity ?? 1),
       0
     );
 
@@ -62,9 +79,10 @@ const Checkout = () => {
       tax,
       grandTotal: totalAfterDiscount + shipping,
     });
-  }, [items, promoDiscountValue]);
+  }, [safeItems, promoDiscountValue]);
 
-  const handleInputChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleInputChange = (e) =>
+    setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const handleApplyPromo = async () => {
     if (!formData.promoCode.trim()) return;
@@ -93,10 +111,9 @@ const Checkout = () => {
         return;
       }
 
-      const subtotal = items.reduce(
+      const subtotal = safeItems.reduce(
         (sum, item) =>
-          sum +
-          priceWithTax(item.promoPrice ?? item.price ?? 0) * item.quantity,
+          sum + priceWithTax(item.promoPrice ?? item.price ?? 0) * (item.quantity ?? 1),
         0
       );
 
@@ -108,7 +125,6 @@ const Checkout = () => {
         text: `Réduction de ${percent}% appliquée !`,
         type: "success",
       });
-
     } catch (error) {
       console.error(error);
       setPromoMessage({ text: "Erreur serveur.", type: "error" });
@@ -118,7 +134,7 @@ const Checkout = () => {
   const handlePaymentSuccess = async (details) => {
     try {
       await addDoc(collection(db, "orders"), {
-        items: items.map(item => ({
+        items: frozenItemsRef.current.map(item => ({
           id: item.id,
           title: item.title,
           quantity: item.quantity,
@@ -136,19 +152,18 @@ const Checkout = () => {
       alert(`Paiement réussi 🎉 Merci ${details.payer.name.given_name} !`);
       setPaymentSuccess(true);
       clearCart();
-
     } catch (err) {
-      console.error("Erreur lors de l'enregistrement de la commande :", err);
+      console.error("Erreur lors de l'enregistrement :", err);
       alert("Erreur lors de l'enregistrement de la commande !");
     }
   };
 
-  if (items.length === 0 && !paymentSuccess) {
+  if (safeItems.length === 0 && !paymentSuccess) {
     return (
       <div className="empty-checkout">
         <div className="empty-content">
           <h2 className="details-title">Votre panier est vide</h2>
-          <p>La quête du savoir commence par un premier ouvrage.</p> <br />
+          <p>La quête du savoir commence par un premier ouvrage.</p><br />
           <Link to="/books" className="buy-btn-large">Parcourir la collection</Link>
         </div>
       </div>
@@ -168,30 +183,24 @@ const Checkout = () => {
   return (
     <div className="checkout-page">
       <header className="checkout-header">
-        <Link
-          to="#"
-          className="back-link"
-          onClick={(e) => {
-            e.preventDefault();
-            navigate(-1); // retourne à la page précédente
-          }}
-        >
+        <Link to="#" className="back-link" onClick={(e) => { e.preventDefault(); navigate(-1); }}>
           <FaChevronLeft /> Retour
         </Link>
-        <h1 className="details-title">Finaliser la <span className="gold-text">Commande</span></h1>
+        <h1 className="details-title">
+          Finaliser la <span className="gold-text">Commande</span>
+        </h1>
       </header>
 
       <div className="checkout-grid-layout">
-        {/* FORMULAIRE */}
         <section className="checkout-main-content">
           <div className="checkout-section-card">
             <span className="overline">01. Expédition</span>
             <div className="input-grid">
-              <input type="text" name="name" placeholder="Nom complet" onChange={handleInputChange} required />
-              <input type="email" name="email" placeholder="Adresse Email" onChange={handleInputChange} required />
-              <input type="text" name="address" placeholder="Adresse de livraison" onChange={handleInputChange} required />
-              <input type="text" name="city" placeholder="Ville" onChange={handleInputChange} required />
-              <input type="text" name="zipCode" placeholder="Code Postal" onChange={handleInputChange} required />
+              <input name="name" placeholder="Nom complet" onChange={handleInputChange} required />
+              <input name="email" type="email" placeholder="Adresse Email" onChange={handleInputChange} required />
+              <input name="address" placeholder="Adresse de livraison" onChange={handleInputChange} required />
+              <input name="city" placeholder="Ville" onChange={handleInputChange} required />
+              <input name="zipCode" placeholder="Code Postal" onChange={handleInputChange} required />
               <select name="country" value={formData.country} onChange={handleInputChange} required>
                 <option value="">Sélectionnez votre pays</option>
                 {europeanCountries.map(c => <option key={c} value={c}>{c}</option>)}
@@ -202,25 +211,29 @@ const Checkout = () => {
           <div className="checkout-section-card promo-section">
             <span className="overline">02. Privilèges</span>
             <div className="promo-flex">
-              <input type="text" name="promoCode" placeholder="Code privilège" value={formData.promoCode} onChange={handleInputChange} />
+              <input name="promoCode" placeholder="Code privilège" value={formData.promoCode} onChange={handleInputChange} />
               <button type="button" className="tool-btn" onClick={handleApplyPromo}>Appliquer</button>
             </div>
             {promoMessage.text && <p className={`promo-msg ${promoMessage.type}`}>{promoMessage.text}</p>}
           </div>
         </section>
 
-        {/* RÉSUMÉ */}
         <aside className="checkout-summary-sidebar">
           <div className="summary-sticky-card">
             <h3 className="summary-title">Votre Sélection</h3>
-            {items.map(item => (
+
+            {safeItems.map(item => (
               <div key={item.id} className="mini-item-card">
                 <img src={item.images?.[0]} alt={item.title} className="mini-img" />
                 <div className="mini-details">
                   <p className="mini-title">{item.title}</p>
-                  <p className="mini-meta">Qté: {item.quantity} • {priceWithTax(item.promoPrice ?? item.price).toFixed(2)}€</p>
+                  <p className="mini-meta">
+                    Qté: {item.quantity} • {priceWithTax(item.promoPrice ?? item.price).toFixed(2)}€
+                  </p>
                 </div>
-                <span className="mini-total">{(priceWithTax(item.promoPrice ?? item.price) * item.quantity).toFixed(2)}€</span>
+                <span className="mini-total">
+                  {(priceWithTax(item.promoPrice ?? item.price) * item.quantity).toFixed(2)}€
+                </span>
               </div>
             ))}
 
@@ -233,23 +246,34 @@ const Checkout = () => {
                   <span>-{promoDiscountValue.toFixed(2)}€</span>
                 </div>
               )}
-              <div className="calc-row grand-total-row"><span>Total</span><span>{totals.grandTotal.toFixed(2)}€</span></div>
+              <div className="calc-row grand-total-row">
+                <span>Total</span><span>{totals.grandTotal.toFixed(2)}€</span>
+              </div>
             </div>
 
-            <div className="payment-security-note"><FaLock /> Paiement 100% sécurisé et crypté</div>
+            <div className="payment-security-note">
+              <FaLock /> Paiement 100% sécurisé et crypté
+            </div>
 
-            {items.length > 0 && (
+            {frozenItemsRef.current.length > 0 && paypalAmountRef.current > 0 && (
               <PayPalButtons
                 style={{ layout: "vertical", color: "gold", shape: "rect", label: "paypal" }}
-                createOrder={(data, actions) => actions.order.create({
-                  purchase_units: [{ amount: {currency_code: "EUR",value: totals.grandTotal.toFixed(2)} }]
-                })}
+                createOrder={(data, actions) =>
+                  actions.order.create({
+                    purchase_units: [
+                      { amount: { currency_code: "EUR", value: paypalAmountRef.current.toFixed(2) } }
+                    ]
+                  })
+                }
                 onApprove={async (data, actions) => {
                   const details = await actions.order.capture();
                   handlePaymentSuccess(details);
                 }}
-                onCancel={() => {alert("Paiement annulé.");}}
-                onError={(err) => {console.error("PayPal error:", err); alert("Le paiement a échoué. Vérifiez votre carte ou votre banque.");}}
+                onCancel={() => alert("Paiement annulé.")}
+                onError={(err) => {
+                  console.error("PayPal error:", err);
+                  alert("Le paiement a échoué.");
+                }}
               />
             )}
           </div>

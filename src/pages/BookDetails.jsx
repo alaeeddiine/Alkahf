@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react"; 
 import { useLocation, useNavigate } from "react-router-dom";
-import { FaArrowRight, FaChevronLeft, FaChevronRight, FaShoppingCart } from "react-icons/fa";
+import { FaArrowRight, FaChevronLeft, FaChevronRight, FaShoppingCart, FaPlus, FaMinus} from "react-icons/fa";
 import { CartContext } from "../context/CartContext";
 
 const TAX_RATE = 21;
@@ -110,15 +110,27 @@ const BookDetails = () => {
             <div className="quantity-price">
               <label>Quantité :</label>
 
-              <input
-                type="number"
-                min="1"
-                value={quantity}
-                onChange={e => {
-                  const value = Math.max(1, Number(e.target.value));
-                  setQuantity(Math.min(value, book.stock));
-                }}
-              />
+              <div className="qty-stepper">
+                <button
+                  onClick={() =>
+                    setQuantity(prev => Math.max(1, prev - 1))
+                  }
+                  disabled={quantity <= 1}
+                >
+                  <FaMinus />
+                </button>
+
+                <span>{quantity}</span>
+
+                <button
+                  onClick={() =>
+                    setQuantity(prev => Math.min(book.stock, prev + 1))
+                  }
+                  disabled={quantity >= book.stock}
+                >
+                  <FaPlus />
+                </button>
+              </div>
 
               {quantity > book.stock && (
                 <p style={{ color: "red", fontSize: "0.85rem", marginTop: "4px" }}>
@@ -163,14 +175,14 @@ const BookDetails = () => {
                 Ajouter au panier <FaShoppingCart style={{ marginLeft: "8px" }} />
               </button>
               <button className="btn btn-sec-book" onClick={handleCheckout}>
-                Passer au checkout <FaArrowRight style={{ marginLeft: "8px" }} />
+                Passer au Paiement <FaArrowRight style={{ marginLeft: "8px" }} />
               </button>
             </div>
 
             {/* Politique de retour */}
             <div className="return-badge">
-              <center><strong> Expédition sous 24h - Frais offerts dés 100€ d'achat</strong></center> <br />
-              <strong> Politique de retour:</strong> vous disposez de 14 jours pour retourner votre Articles après sa réception. 
+              <center><strong> Expédition sous 48h - Frais offerts dés 100€ d'achat</strong></center> <br />
+              <strong> Politique de retour:</strong> Vous disposez de 14 jours pour retourner votre Articles après sa réception. 
             </div>
 
             {/* Description */}

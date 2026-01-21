@@ -34,7 +34,7 @@ const Footer = () => {
           <div className="gold-underline"></div>
           <ul>
             <li><Link to="/books"><FaChevronRight /> Livres adultes</Link></li>
-            <li><Link to="/kids"><FaChevronRight /> Livvres enfants</Link></li>
+            <li><Link to="/kids"><FaChevronRight /> Livres enfants</Link></li>
             <li><Link to="/packs"><FaChevronRight /> Packs Exclusifs</Link></li>
             <li><Link to="/about"><FaChevronRight /> À Propos</Link></li>
           </ul>

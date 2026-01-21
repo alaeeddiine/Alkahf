@@ -99,7 +99,7 @@ const CartPopup = ({ isOpen, onClose }) => {
                         <FaTrashAlt />
                       </button>
                     </div>
-                    <p className="item-meta">Par {item.author}</p>
+                    <p className="item-meta">Edition {item.edition}</p>
                     {item.language && <p className="book-language">{item.language}</p>}
 
                     <div className="item-controls-row">

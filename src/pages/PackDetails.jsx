@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react"; 
 import { useLocation, useNavigate } from "react-router-dom";
-import { FaArrowRight, FaChevronLeft, FaChevronRight, FaShoppingCart } from "react-icons/fa";
+import { FaArrowRight, FaChevronLeft, FaChevronRight, FaShoppingCart, FaMinus, FaPlus } from "react-icons/fa";
 import { CartContext } from "../context/CartContext";
 import { db } from "../firebase/config";
 import { doc, getDoc } from "firebase/firestore";
@@ -123,16 +123,27 @@ const PackDetails = () => {
             <div className="quantity-price">
               <label>Quantité :</label>
 
-              <input
-                type="number"
-                min="1"
-                max={5} // limite à 5 exemplaires
-                value={quantity}
-                onChange={e => {
-                  const value = Math.max(1, Number(e.target.value));
-                  setQuantity(Math.min(value, 5)); // ne dépasse jamais 5
-                }}
-              />
+              <div className="qty-stepper">
+                <button
+                  onClick={() =>
+                    setQuantity(prev => Math.max(1, prev - 1))
+                  }
+                  disabled={quantity <= 1}
+                >
+                  <FaMinus />
+                </button>
+
+                <span>{quantity}</span>
+
+                <button
+                  onClick={() =>
+                    setQuantity(prev => Math.min(5, prev + 1))
+                  }
+                  disabled={quantity >= 5}
+                >
+                  <FaPlus />
+                </button>
+              </div>
 
               {quantity > 5 && (
                 <p style={{ color: "red", fontSize: "0.85rem", marginTop: "4px" }}>
@@ -180,14 +191,14 @@ const PackDetails = () => {
                 Ajouter au panier <FaShoppingCart style={{ marginLeft: "8px" }} />
               </button>
               <button className="btn btn-sec-book" onClick={handleCheckout}>
-                Passer au checkout <FaArrowRight style={{ marginLeft: "8px" }} />
+                Passer au Paiement <FaArrowRight style={{ marginLeft: "8px" }} />
               </button>
             </div>
 
             {/* Politique de retour */}
             <div className="return-badge">
-              <center><strong> Expédition sous 24h - Frais offerts dés 100€ d'achat</strong></center> <br />
-              <strong> Politique de retour:</strong> vous disposez de 14 jours pour retourner votre Articles après sa réception. 
+              <center><strong> Expédition sous 48h - Frais offerts dés 100€ d'achat</strong></center> <br />
+              <strong> Politique de retour:</strong> Vous disposez de 14 jours pour retourner votre Articles après sa réception. 
             </div>
 
             {/* Description */}
