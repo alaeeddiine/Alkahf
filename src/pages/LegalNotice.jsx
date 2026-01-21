@@ -4,58 +4,82 @@ const LegalNotice = () => {
   return (
     <section className="legal-section">
       <div className="container-inner legal-container">
-        
+
         <header className="legal-header">
-          <span className="gold-label">Informations légales</span>
+          <span className="gold-label">Cadre juridique</span>
           <h1>Mentions légales</h1>
           <p className="legal-subtitle">
-            Conformément au Code de droit économique belge
+            Dernière mise à jour : 01/02/2026
           </p>
         </header>
 
         <div className="legal-card">
-          <h2>Éditeur du site</h2>
+          <h2>1. Informations générales</h2>
           <p>
-            <strong>Islamic Books Store</strong><br />
-            Activité : Vente de livres islamiques<br />
-            Adresse : Rue Exemple 10, 1000 Bruxelles, Belgique<br />
+            Nom commercial : <strong>Al Kahf</strong><br />
+            Statut : Société<br />
             Email : alkahf.be@gmail.com<br />
-            Numéro BCE : 0XXX.XXX.XXX<br />
-            TVA : BE0XXX.XXX.XXX
+            Numéro d’entreprise (BCE) : XXXXXXXX<br />
+            Numéro de TVA : XXXXXXXX
           </p>
         </div>
 
         <div className="legal-card">
-          <h2>Hébergement</h2>
+          <h2>2. Hébergement du site</h2>
           <p>
-            Hébergeur : combell<br />
-            Site web : www.combell.com/fr
+            Le site est hébergé par : Alkahf <br /><br />
+            Nom : Combell<br />
+            Site web : www.combell.com/fr/
           </p>
         </div>
 
         <div className="legal-card">
-          <h2>Propriété intellectuelle</h2>
+          <h2>3. Propriété intellectuelle</h2>
           <p>
-            Tous les contenus présents sur ce site sont protégés par le droit
-            d’auteur. Toute reproduction ou utilisation sans autorisation est
-            strictement interdite.
+            L’ensemble des contenus du site (textes, images, logos, graphismes,
+            vidéos) est la propriété exclusive de Al Kahf ou de ses partenaires.
+            <br /><br />
+            Toute reproduction sans autorisation écrite est strictement interdite.
           </p>
         </div>
 
         <div className="legal-card">
-          <h2>Responsabilité</h2>
+          <h2>4. Données personnelles</h2>
           <p>
-            Le vendeur ne peut être tenu responsable des interruptions,
-            dysfonctionnements ou dommages indirects liés à l’utilisation du site.
+            Les données collectées sont utilisées uniquement pour la gestion des
+            commandes et la relation client, conformément au RGPD.
+            <br /><br />
+            Pour plus d’informations, consulter la Politique de confidentialité.
           </p>
         </div>
 
         <div className="legal-card">
-          <h2>Droit applicable</h2>
+          <h2>5. Cookies</h2>
           <p>
-            Le site est soumis au droit belge. Tout litige relève de la compétence
-            exclusive des tribunaux belges.
+            Le site utilise des cookies.
+            <br /><br />
+            Pour plus d’informations, consulter la Politique de cookies.
           </p>
+        </div>
+
+        <div className="legal-card">
+          <h2>6. Responsabilité</h2>
+          <p>
+            Al Kahf s’efforce d’assurer l’exactitude des informations publiées,
+            sans pouvoir garantir l’absence d’erreurs.
+          </p>
+        </div>
+
+        <div className="legal-card">
+          <h2>7. Droit applicable</h2>
+          <p>
+            Les présentes mentions légales sont régies par le droit belge.
+          </p>
+        </div>
+
+        <div className="legal-card">
+          <h2>8. Contact</h2>
+          <p>📧 <strong>alkahf.be@gmail.com</strong></p>
         </div>
 
       </div>

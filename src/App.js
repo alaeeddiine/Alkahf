@@ -23,6 +23,8 @@ import PackDetails from "./pages/PackDetails";
 import Checkout from "./pages/Checkout"; 
 import LegalNotice from "./pages/LegalNotice";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfUse from "./pages/TermsOfUse";
+import TermsOfSale from "./pages/TermsOfSale";
 
 import Login from "./admin/login";
 import AdminDashboard from "./admin/AdminDashboard";
@@ -132,6 +134,8 @@ function App() {
             <Route path="/checkout" element={<Checkout />} /> 
             <Route path="/LegalNotice" element={<LegalNotice />} />
             <Route path="/PrivacyPolicy" element={<PrivacyPolicy />} />
+            <Route path="/TermsOfUse" element={<TermsOfUse />} />
+            <Route path="/TermsOfSale" element={<TermsOfSale />} />
           </Route>
 
           {/* 🔹 ADMIN LOGIN */}
