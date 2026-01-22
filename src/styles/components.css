@@ -404,6 +404,31 @@
 .footer-legal a { color: #666; text-decoration: none; }
 .footer-legal a:hover { color: var(--gold); }
 .dot { width: 4px; height: 4px; background: #444; border-radius: 50%; }
+/* Pour les écrans jusqu'à 480px */
+@media (max-width: 480px) {
+  .footer-legal {
+    display: flex;
+    flex-wrap: wrap;        /* permet de passer à la ligne suivante */
+    justify-content: center; /* centre les éléments */
+    gap: 10px;              /* espace entre les éléments */
+  }
+  .footer-legal a {
+    flex: 0 0 45%;           /* chaque lien prend environ la moitié de la ligne */
+    text-align: center;      /* centre le texte à l'intérieur du lien */
+    font-size: 14px;
+  }
+  .dot {
+    display: none;           /* optionnel : cacher les petits dots pour pas surcharger */
+  }
+}
+
+/* Pour les écrans jusqu'à 360px */
+@media (max-width: 360px) {
+  .footer-legal a {
+    flex: 0 0 48%;           /* un peu plus large pour occuper la ligne */
+    font-size: 13px;
+  }
+}
 
 /* =========================================
    Mobile Footer Adjustments
