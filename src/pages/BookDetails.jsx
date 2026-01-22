@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useContext } from "react"; 
+import React, { useState, useEffect, useContext, useCallback } from "react"; 
 import { useLocation, useNavigate } from "react-router-dom";
-import { FaArrowRight, FaChevronLeft, FaChevronRight, FaShoppingCart, FaPlus, FaMinus} from "react-icons/fa";
+import { FaArrowRight, FaChevronLeft, FaChevronRight, FaShoppingCart, FaPlus, FaMinus } from "react-icons/fa";
 import { CartContext } from "../context/CartContext";
 
 const TAX_RATE = 21;
@@ -16,22 +16,24 @@ const BookDetails = () => {
   const [quantity, setQuantity] = useState(1);
   const [activeImgIdx, setActiveImgIdx] = useState(0);
 
-  const totalPrice = book ? getPriceWithTax(book.promoPrice ?? book.price) * quantity : 0;
-
   // ---------------- LOAD BOOK ----------------
   useEffect(() => {
     if (!book && bookId) {
       // fetch book by id et setBook(fetchedBook)
+      // Exemple: setBook(fetchedBook)
     }
   }, [book, bookId]);
 
   // ---------------- CAROUSEL ----------------
-  const handlePrevImg = () => {
+  const handlePrevImg = useCallback(() => {
+    if (!book) return;
     setActiveImgIdx(prev => (prev === 0 ? (book.images?.length || 1) - 1 : prev - 1));
-  };
-  const handleNextImg = () => {
+  }, [book]);
+
+  const handleNextImg = useCallback(() => {
+    if (!book) return;
     setActiveImgIdx(prev => (prev === (book.images?.length || 1) - 1 ? 0 : prev + 1));
-  };
+  }, [book]);
 
   // ---------------- SWIPE MOBILE ----------------
   useEffect(() => {
@@ -58,7 +60,7 @@ const BookDetails = () => {
       imgContainer.removeEventListener("touchmove", handleTouchMove);
       imgContainer.removeEventListener("touchend", handleTouchEnd);
     };
-  }, [activeImgIdx, book]);
+  }, [activeImgIdx, book, handlePrevImg, handleNextImg]);
 
   if (!book) return <p>Chargement du livre...</p>;
 
@@ -90,7 +92,13 @@ const BookDetails = () => {
                 <button className="next-btn" onClick={handleNextImg}><FaChevronRight /></button>
                 <div className="thumbnail-row">
                   {book.images.map((img, idx) => (
-                    <img key={idx} src={img} className={`thumb ${activeImgIdx === idx ? "active-thumb" : ""}`} onClick={() => setActiveImgIdx(idx)} alt={`thumb ${idx + 1}`} />
+                    <img
+                      key={idx}
+                      src={img}
+                      className={`thumb ${activeImgIdx === idx ? "active-thumb" : ""}`}
+                      onClick={() => setActiveImgIdx(idx)}
+                      alt={`thumb ${idx + 1}`}
+                    />
                   ))}
                 </div>
               </div>
@@ -109,23 +117,16 @@ const BookDetails = () => {
             {/* Quantité + prix */}
             <div className="quantity-price">
               <label>Quantité :</label>
-
               <div className="qty-stepper">
                 <button
-                  onClick={() =>
-                    setQuantity(prev => Math.max(1, prev - 1))
-                  }
+                  onClick={() => setQuantity(prev => Math.max(1, prev - 1))}
                   disabled={quantity <= 1}
                 >
                   <FaMinus />
                 </button>
-
                 <span>{quantity}</span>
-
                 <button
-                  onClick={() =>
-                    setQuantity(prev => Math.min(book.stock, prev + 1))
-                  }
+                  onClick={() => setQuantity(prev => Math.min(book.stock, prev + 1))}
                   disabled={quantity >= book.stock}
                 >
                   <FaPlus />
@@ -181,14 +182,14 @@ const BookDetails = () => {
 
             {/* Politique de retour */}
             <div className="return-badge">
-              <center><strong> Expédition sous 48h - Frais offerts dés 100€ d'achat</strong></center> <br />
-              <strong> Politique de retour:</strong> Vous disposez de 14 jours pour retourner votre Articles après sa réception. 
+              <center><strong>Expédition sous 48h - Frais offerts dès 100€ d'achat</strong></center> <br />
+              <strong>Politique de retour:</strong> Vous disposez de 14 jours pour retourner vos articles après réception.
             </div>
 
             {/* Description */}
             <div className="book-description">
               <h2>Description</h2>
-              <p>{book.description || "aucune description pour le moment"}</p>
+              <p>{book.description || "Aucune description pour le moment"}</p>
             </div>
           </div>
         </div>
