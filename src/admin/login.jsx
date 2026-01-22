@@ -3,7 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { auth } from "../firebase/config";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { FaLock, FaEnvelope, FaShieldAlt, FaArrowRight, FaFingerprint } from "react-icons/fa";
-import logo from "../assets/logo.png";
+
+const logo =
+  "https://res.cloudinary.com/djukqnpbs/image/upload/f_auto,q_auto/logo_xqqw2s";
 
 const Login = () => {
   const navigate = useNavigate();

@@ -20,13 +20,19 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 import { db } from "../firebase/config";
-import heroVideo from "../assets/hero.mp4";
-import heroImg1 from "../assets/mobile1.jpeg"; 
-import heroImg2 from "../assets/mobile2.jpeg";
 
 /* ---------- TAX UTILS ---------- */
 const TAX_RATE = 21;
-const getPriceWithTax = (price) => +(price * (1 + TAX_RATE / 100)).toFixed(2);
+const getPriceWithTax = (price) => +(price * (1 + TAX_RATE / 100)).toFixed(2);// ✅ 1. Déclarer les URLs AVANT utilisation
+
+const heroVideo =
+  "https://res.cloudinary.com/djukqnpbs/video/upload/q_auto,f_auto/hero_pmwncb";
+
+const heroImg1 =
+  "https://res.cloudinary.com/djukqnpbs/image/upload/f_auto,q_auto/mobile1_xvrpdy";
+
+const heroImg2 =
+  "https://res.cloudinary.com/djukqnpbs/image/upload/f_auto,q_auto/mobile2_ngk5fv";
 
 const Home = () => {
   const [latestBooks, setLatestBooks] = useState([]);
@@ -40,8 +46,11 @@ const Home = () => {
   const [videoReady, setVideoReady] = useState(false);
   const [reviewData, setReviewData] = useState({ name: "", email: "", message: "", rating: 0 });
 
-  const [currentSlide, setCurrentSlide] = useState(0); // Pour le carrousel mobile
-  const mobileSlides = [heroImg1, heroImg2]; // Images du carrousel
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  // ✅ 2. Maintenant on peut les utiliser
+  const mobileSlides = [heroImg1, heroImg2];
+
 
   // ---------- Newsletter ----------
   const handleNewsletterSubmit = async (e) => {

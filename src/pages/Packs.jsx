@@ -4,17 +4,15 @@ import { useNavigate } from "react-router-dom";
 import { collection, getDocs, orderBy, query, where } from "firebase/firestore";
 import { CartContext } from "../context/CartContext";
 import {
-  FaTimes,
   FaShoppingCart,
-  FaShieldAlt,
-  FaGlobe,
-  FaGem,
-  FaBoxOpen
 } from "react-icons/fa";
 
 // ----- UTILITAIRES TAXES -----
 const TAX_RATE = 21; // %
 const getPriceWithTax = (price) => +(price * (1 + TAX_RATE / 100)).toFixed(2);
+
+const banner =
+  "https://res.cloudinary.com/djukqnpbs/image/upload/f_auto,q_auto/banner_rwqp2q";
 
 const PacksClient = () => {
   const [packs, setPacks] = useState([]);

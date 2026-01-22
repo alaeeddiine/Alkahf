@@ -2704,7 +2704,7 @@ h2 { font-size: 2rem; text-align: center; margin-bottom: 1rem; text-transform: u
 .hero-visual-bg {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
-  background-image: linear-gradient(to bottom, rgba(0,0,0,0.3), var(--black)), url('../assets/alkahf-books.png');
+  background-image: linear-gradient(to bottom, rgba(0,0,0,0.3), var(--black)), url('https://res.cloudinary.com/djukqnpbs/image/upload/f_auto,q_auto/alkahf-books_pwfbli');
   background-size: cover;
   background-position: center;
   opacity: 0.6;

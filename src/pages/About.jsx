@@ -1,7 +1,10 @@
 import React from 'react';
 import { FaBookOpen, FaHandHoldingHeart, FaMedal, FaGlobeAfrica } from 'react-icons/fa';
 import { GiBookshelf, GiScrollUnfurled } from 'react-icons/gi'; // Nouvelles icônes plus "bibliothèque"
-import banner from '../assets/banner.png'; // Assurez-vous que l'image est une belle photo de livres anciens
+
+
+const banner =
+  "https://res.cloudinary.com/djukqnpbs/image/upload/f_auto,q_auto/banner_rwqp2q";
 
 const About = () => {
   return (

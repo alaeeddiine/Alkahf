@@ -10,7 +10,6 @@ import {
   FaBox
 } from "react-icons/fa";
 import { CartContext } from "../context/CartContext";
-import logo from "../assets/logo.png";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase/config";
 
@@ -47,6 +46,9 @@ const formatTarget = (appliesTo) => {
   }
   return translateTarget(appliesTo);
 };
+
+const logo =
+  "https://res.cloudinary.com/djukqnpbs/image/upload/f_auto,q_auto/logo_xqqw2s";
 
 const Navbar = ({ onCartClick }) => {
   const { cartItems = [] } = useContext(CartContext) || {};

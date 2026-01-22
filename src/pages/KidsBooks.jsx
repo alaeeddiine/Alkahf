@@ -6,8 +6,6 @@ import {
   FaShoppingCart, FaSpinner, FaTimes, FaEye, FaStar,
   FaSortAmountDown, FaSearch
 } from 'react-icons/fa';
-import logo from "../assets/kids.png";
-import headerBg from "../assets/kids-banner.png";
 
 /* 🔥 FIRESTORE PROMOS */
 import { db } from "../firebase/config";
@@ -30,6 +28,12 @@ const applyPromo = (price, promo) => {
   if (!promo || promo.amount == null) return price;
   return +(price * (1 - promo.amount / 100)).toFixed(2);
 };
+
+const headerBg =
+  "https://res.cloudinary.com/djukqnpbs/image/upload/f_auto,q_auto/kids-banner_nmdbk6";
+
+const logo =
+  "https://res.cloudinary.com/djukqnpbs/image/upload/f_auto,q_auto/kids_jxrz0q";
 
 const KidsBooks = () => {
   const [books, setBooks] = useState([]);

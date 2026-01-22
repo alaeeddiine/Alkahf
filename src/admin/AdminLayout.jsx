@@ -4,7 +4,9 @@ import {
   FaBook, FaShoppingCart, FaTags, FaEnvelope, 
   FaSignOutAlt, FaChartLine, FaBars, FaTimes, FaBox, FaStar
 } from "react-icons/fa";
-import logo from '../assets/logo.png';
+
+const logo =
+  "https://res.cloudinary.com/djukqnpbs/image/upload/f_auto,q_auto/logo_xqqw2s";
 
 const AdminLayout = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
