@@ -88,12 +88,12 @@ const PackDetails = () => {
   const discountPercent = hasDiscount ? Math.round(100 - (pack.promoPrice / pack.price) * 100) : 0;
 
   return (
-    <div className="book-details-page"> {/* same as book-details-page */}
+    <div className="book-details-page">
       <div className="container-inner">
         <div className="book-details-grid">
 
           {/* ---------------- IMAGE CAROUSEL ---------------- */}
-          <div className="book-images"> {/* same as book-images */}
+          <div className="book-images">
             {pack.images?.length > 1 ? (
               <div className="carousel-container">
                 <img src={pack.images[activeImgIdx]} alt={`${pack.title} ${activeImgIdx + 1}`} className="main-img" />
@@ -111,7 +111,7 @@ const PackDetails = () => {
           </div>
 
           {/* ---------------- INFO PANEL ---------------- */}
-          <div className="book-info-panel"> {/* same as book-info-panel */}
+          <div className="book-info-panel">
             {hasDiscount && <div className="discount-badge">-{discountPercent}%</div>}
             <h1 className="book-title">{pack.title}</h1>
 
@@ -122,72 +122,49 @@ const PackDetails = () => {
             {/* Quantité + prix */}
             <div className="quantity-price">
               <label>Quantité :</label>
-
               <div className="qty-stepper">
                 <button
-                  onClick={() =>
-                    setQuantity(prev => Math.max(1, prev - 1))
-                  }
+                  onClick={() => setQuantity(prev => Math.max(1, prev - 1))}
                   disabled={quantity <= 1}
                 >
                   <FaMinus />
                 </button>
-
                 <span>{quantity}</span>
-
                 <button
-                  onClick={() =>
-                    setQuantity(prev => Math.min(5, prev + 1))
-                  }
-                  disabled={quantity >= 5}
+                  onClick={() => setQuantity(prev => Math.min(pack.stock || 5, prev + 1))}
+                  disabled={quantity >= (pack.stock || 5)}
                 >
                   <FaPlus />
                 </button>
               </div>
 
-              {quantity > 5 && (
+              {quantity > (pack.stock || 5) && (
                 <p style={{ color: "red", fontSize: "0.85rem", marginTop: "4px" }}>
-                  Quantité maximale : 5
+                  Quantité maximale : {pack.stock || 5}
                 </p>
               )}
-
-              {hasDiscount && <div className="discount-badge">-{discountPercent}%</div>}
 
               <span className="price-packs">
                 {hasDiscount ? (
                   <>
                     <s>
-                      {(getPriceWithTax(pack.price) * quantity).toLocaleString("fr-FR", {
-                        style: "currency",
-                        currency: "EUR",
-                      })}
+                      {(getPriceWithTax(pack.price) * quantity).toLocaleString("fr-FR", { style: "currency", currency: "EUR" })}
                     </s>{" "}
                     <strong>
-                      {(getPriceWithTax(pack.promoPrice) * quantity).toLocaleString("fr-FR", {
-                        style: "currency",
-                        currency: "EUR",
-                      })}
+                      {(getPriceWithTax(pack.promoPrice) * quantity).toLocaleString("fr-FR", { style: "currency", currency: "EUR" })}
                     </strong>
                   </>
                 ) : (
                   <span>
-                    {(getPriceWithTax(pack.price) * quantity).toLocaleString("fr-FR", {
-                      style: "currency",
-                      currency: "EUR",
-                    })}
+                    {(getPriceWithTax(pack.price) * quantity).toLocaleString("fr-FR", { style: "currency", currency: "EUR" })}
                   </span>
                 )}
               </span>
             </div>
 
-
             {/* Actions */}
-            <div className="book-actions"> {/* same as book-actions */}
-              <button
-                className="btn btn-primary"
-                onClick={handleAddToCart}
-                disabled={quantity > pack.stock}
-              >
+            <div className="book-actions">
+              <button className="btn btn-primary" onClick={handleAddToCart} disabled={quantity > (pack.stock || 5)}>
                 Ajouter au panier <FaShoppingCart style={{ marginLeft: "8px" }} />
               </button>
               <button className="btn btn-sec-book" onClick={handleCheckout}>
@@ -197,14 +174,14 @@ const PackDetails = () => {
 
             {/* Politique de retour */}
             <div className="return-badge">
-              <center><strong> Expédition sous 48h - Frais offerts dés 100€ d'achat</strong></center> <br />
-              <strong> Politique de retour:</strong> Vous disposez de 14 jours pour retourner votre Articles après sa réception. 
+              <center><strong>Expédition sous 48h - Frais offerts dès 100€ d'achat</strong></center><br/>
+              <strong>Politique de retour:</strong> Vous disposez de 14 jours pour retourner vos articles après réception.
             </div>
 
             {/* Description */}
             <div className="book-description">
               <h2>Description</h2>
-              <p>{pack.description || "aucune description pour le moment"}</p>
+              <p>{pack.description || "Aucune description pour le moment"}</p>
             </div>
 
             {/* Livres inclus */}
